@@ -4,7 +4,7 @@ public enum OptimizationSense {
     MINIMIZE(false),
     MAXIMIZE(true);
 
-    private boolean maximize;
+    private final boolean maximize;
 
     OptimizationSense(boolean maximize) {
         this.maximize = maximize;

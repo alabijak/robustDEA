@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PerformanceSamplesCollection {
-    private List<DataFrame<Double>> inputPerformances;
-    private List<DataFrame<Double>> outputPerformances;
+    private final List<DataFrame<Double>> inputPerformances;
+    private final List<DataFrame<Double>> outputPerformances;
 
     public PerformanceSamplesCollection() {
         this.inputPerformances = new ArrayList<>();
@@ -18,15 +18,8 @@ public class PerformanceSamplesCollection {
         return inputPerformances;
     }
 
-    public void setInputPerformances(List<DataFrame<Double>> inputPerformances) {
-        this.inputPerformances = inputPerformances;
-    }
-
     public List<DataFrame<Double>> getOutputPerformances() {
         return outputPerformances;
     }
 
-    public void setOutputPerformances(List<DataFrame<Double>> outputPerformances) {
-        this.outputPerformances = outputPerformances;
-    }
 }

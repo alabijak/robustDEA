@@ -10,20 +10,19 @@ public class ImpreciseInformation {
     private DataFrame<Double> maxInputs;
     private DataFrame<Double> maxOutputs;
 
-    private double tolerance = 0.0;
+    private final double tolerance;
 
     private Set<String> ordinalFactors = new HashSet<>();
 
-    private ProblemData data;
+    private final ProblemData data;
 
     public ImpreciseInformation(ProblemData data, double tolerance) {
-
         this.data = data;
         this.tolerance = tolerance;
     }
 
     public ImpreciseInformation(ProblemData data, DataFrame<Double> maxInputs, DataFrame<Double> maxOutputs) {
-        this.data = data;
+        this(data, 0.0);
         this.maxInputs = maxInputs;
         this.maxOutputs = maxOutputs;
     }
@@ -38,10 +37,6 @@ public class ImpreciseInformation {
 
     public double getTolerance() {
         return tolerance;
-    }
-
-    public void setTolerance(double tolerance) {
-        this.tolerance = tolerance;
     }
 
     public Set<String> getOrdinalFactors() {

@@ -7,7 +7,7 @@ import put.dea.common.smaa.SmaaPreferenceRelationsBase;
 
 import java.util.Random;
 
-public class CCRSmaaPreferenceRelations extends CCRSmaaBase implements SmaaPreferenceRelations {
+public class CCRSmaaPreferenceRelations extends CCRSmaaBase implements SmaaPreferenceRelations<ProblemData> {
 
     public CCRSmaaPreferenceRelations(int numberOfSamples) {
         this(numberOfSamples, new Random());

@@ -11,8 +11,6 @@ public class VDEAExtremeRanks
         extends VDEABase
         implements ExtremeRanks<VDEAProblemData> {
 
-    private ExtremeRanksBase extremeRanksBase = new ExtremeRanksBase();
-
     @Override
     public int minRank(VDEAProblemData data, int subjectDmuIdx) {
         return createModel(data, subjectDmuIdx, OptimizationSense.MINIMIZE,
@@ -26,6 +24,7 @@ public class VDEAExtremeRanks
     }
 
     public int createModel(VDEAProblemData data, int subjectDmuIdx, OptimizationSense sense, Double constraintsLower, Double constraintUpper) {
+        var extremeRanksBase = new ExtremeRanksBase();
         var inputs = transformInputsToUtilities(data);
         var outputs = transformOutputsToUtilities(data);
 

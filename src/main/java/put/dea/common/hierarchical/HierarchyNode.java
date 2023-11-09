@@ -52,10 +52,6 @@ public class HierarchyNode {
         return this.children.isEmpty();
     }
 
-    public List<HierarchyNode> getChildren() {
-        return children.values().stream().toList();
-    }
-
     public Set<String> findAllChildFactors() {
         if (isLeaf())
             return Set.of(this.name);

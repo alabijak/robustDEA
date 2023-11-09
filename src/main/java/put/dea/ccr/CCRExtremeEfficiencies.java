@@ -91,9 +91,4 @@ public class CCRExtremeEfficiencies
         return findMaxOrSuperEfficiency(data, subjectDmuIdx, true);
     }
 
-    public double[] findMaxEfficiencyWeights(ProblemData data, int subjectDmuIdx) {
-        var model = createMaxOrSuperEfficiencyModel(data, subjectDmuIdx, false);
-        var variables = model.variables();
-        return Arrays.stream(variables).mapToDouble(MPVariable::solutionValue).toArray();
-    }
 }

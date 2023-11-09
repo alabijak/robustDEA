@@ -7,7 +7,7 @@ import java.util.List;
 
 public class CCRImpreciseProblemData extends ProblemData {
 
-    private ImpreciseInformation impreciseInformation;
+    private final ImpreciseInformation impreciseInformation;
 
     public CCRImpreciseProblemData(double[][] inputData, double[][] outputData, double tolerance) {
         this(inputData, outputData, null, null, tolerance);

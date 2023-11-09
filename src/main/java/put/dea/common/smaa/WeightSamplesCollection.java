@@ -5,8 +5,8 @@ import joinery.DataFrame;
 import java.util.Arrays;
 
 public class WeightSamplesCollection {
-    private DataFrame<Double> inputSamples;
-    private DataFrame<Double> outputSamples;
+    private final DataFrame<Double> inputSamples;
+    private final DataFrame<Double> outputSamples;
 
     public WeightSamplesCollection(double[][] samples, int inputCount) {
         inputSamples = new DataFrame<>();

@@ -7,7 +7,6 @@ import put.dea.common.OptimizationSense;
 import put.dea.common.ProblemData;
 
 public class CCRExtremeRanks extends CCRRobustnessBase implements ExtremeRanks<ProblemData> {
-    private ExtremeRanksBase extremeRanksBase = new ExtremeRanksBase();
 
     @Override
     public int minRank(ProblemData data, int subjectDmuIdx) {
@@ -21,6 +20,7 @@ public class CCRExtremeRanks extends CCRRobustnessBase implements ExtremeRanks<P
 
     public int createModel(ProblemData data, int subjectDmuIdx, OptimizationSense sense,
                            Double constraintsLower, Double constraintUpper) {
+        var extremeRanksBase = new ExtremeRanksBase();
         var model = makeModel(sense);
 
         var inputWeights = createWeightVariablesWithEqualToOneConstraint(model,

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 public class HierarchicalVDEAProblemData extends VDEAProblemData {
-    private HierarchyNode hierarchy;
+    private final HierarchyNode hierarchy;
 
     public HierarchicalVDEAProblemData(double[][] inputData, double[][] outputData,
                                        HierarchyNode hierarchy) {

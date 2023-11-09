@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class ImpreciseVDEAProblemData extends VDEAProblemData {
 
-    private ImpreciseInformation impreciseInformation;
+    private final ImpreciseInformation impreciseInformation;
 
     private Map<String, List<Pair<Double, Double>>> lowerFunctionShapes = new HashMap<>();
     private Map<String, List<Pair<Double, Double>>> upperFunctionShapes = new HashMap<>();
@@ -29,7 +29,7 @@ public class ImpreciseVDEAProblemData extends VDEAProblemData {
                 convertArrayToDataFrame(maxOutputData, getOutputNames()));
     }
 
-    public <E> ImpreciseVDEAProblemData(double[][] minInputData, double[][] minOutputData,
+    public ImpreciseVDEAProblemData(double[][] minInputData, double[][] minOutputData,
                                         double[][] maxInputData, double[][] maxOutputData,
                                         List<String> inputNames, List<String> outputNames) {
         super(minInputData, minOutputData, inputNames, outputNames);
@@ -50,15 +50,8 @@ public class ImpreciseVDEAProblemData extends VDEAProblemData {
         return getFunctionShape(column);
     }
 
-    public void setLowerFunctionShapes(Map<String, List<Pair<Double, Double>>> lowerFunctionShapes) {
-        this.lowerFunctionShapes = lowerFunctionShapes;
-    }
-
-    public void setUpperFunctionShapes(Map<String, List<Pair<Double, Double>>> upperFunctionShapes) {
-        this.upperFunctionShapes = upperFunctionShapes;
-    }
-
-    public void setColumnFunctionShapes(String column, List<Pair<Double, Double>> lowerFunction,
+    public void setColumnFunctionShapes(String column,
+                                        List<Pair<Double, Double>> lowerFunction,
                                         List<Pair<Double, Double>> upperFunction) {
         setLowerFunctionShape(column, lowerFunction);
         setUpperFunctionShape(column, upperFunction);
