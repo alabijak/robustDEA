@@ -8,6 +8,8 @@ import put.dea.common.imprecise.ResultType;
 import put.dea.vdea.VDEABase;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class ImpreciseVDEAExtremeDistances extends VDEABase
         implements ExtremeDistances<ImpreciseVDEAProblemData> {
@@ -26,16 +28,16 @@ public class ImpreciseVDEAExtremeDistances extends VDEABase
 
     @Override
     public double minDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx) {
-        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE);
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, false);
     }
 
     @Override
     public double maxDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx) {
-        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MAXIMIZE);
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MAXIMIZE, false);
     }
 
     private double findMinOrMaxDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx,
-                                        OptimizationSense sense) {
+                                        OptimizationSense sense, boolean superDistance) {
         var preciseData = performanceConverter.convertPerformanceToPrecise(data.getImpreciseInformation(),
                 subjectDmuIdx,
                 sense.isMaximize() ? ResultType.PESSIMISTIC : ResultType.OPTIMISTIC);
@@ -72,6 +74,15 @@ public class ImpreciseVDEAExtremeDistances extends VDEABase
         addCustomWeightConstraints(data, model);
         return getModelResult(model);
     }
+    public double superDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx){
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, true);
+    }
 
+    public List<Double> superDistanceForAll(ImpreciseVDEAProblemData data) {
+        return IntStream.range(0, data.getDmuCount())
+                .mapToDouble(idx -> superDistance(data, idx))
+                .boxed()
+                .toList();
+    }
 
 }

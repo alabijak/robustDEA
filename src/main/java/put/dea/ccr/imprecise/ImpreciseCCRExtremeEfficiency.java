@@ -9,6 +9,8 @@ import put.dea.common.imprecise.ImprecisePerformanceConverter;
 import put.dea.common.imprecise.ResultType;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class ImpreciseCCRExtremeEfficiency extends CCRRobustnessBase
         implements ExtremeEfficiency<CCRImpreciseProblemData> {
@@ -108,5 +110,14 @@ public class ImpreciseCCRExtremeEfficiency extends CCRRobustnessBase
                 data.getDmuCount());
     }
 
+    public double superEfficiency(CCRImpreciseProblemData data, int subjectDmuIdx) {
+        var model= createMaxOrSuperEfficiencyModel(data, subjectDmuIdx, true);
+        return model.objective().value();
+    }
 
+    public List<Double> superEfficiencyForAll(CCRImpreciseProblemData data){
+        return IntStream.range(0, data.getDmuCount())
+                .mapToDouble(idx->superEfficiency(data, idx))
+                .boxed().toList();
+    }
 }
