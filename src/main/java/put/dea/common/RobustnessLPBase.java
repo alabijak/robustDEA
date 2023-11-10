@@ -1,5 +1,6 @@
 package put.dea.common;
 
+import com.google.ortools.Loader;
 import com.google.ortools.linearsolver.MPConstraint;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
@@ -9,6 +10,9 @@ import put.dea.weightConstraints.Constraint;
 import java.util.List;
 
 public class RobustnessLPBase {
+    public RobustnessLPBase(){
+        Loader.loadNativeLibraries();
+    }
 
     protected MPSolver makeModel(OptimizationSense sense) {
         MPSolver model = MPSolver.createSolver("SCIP");

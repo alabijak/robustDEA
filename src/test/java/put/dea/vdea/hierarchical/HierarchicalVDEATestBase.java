@@ -1,6 +1,5 @@
 package put.dea.vdea.hierarchical;
 
-import com.google.ortools.Loader;
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import put.dea.common.hierarchical.HierarchyNode;
@@ -15,7 +14,6 @@ public class HierarchicalVDEATestBase {
 
     @BeforeEach
     public void initializeData() {
-        Loader.loadNativeLibraries();
         var inputs = new double[][]{
                 new double[]{4.05, 46.1, 19.23},
                 new double[]{5.36, 38.9, 27.04},

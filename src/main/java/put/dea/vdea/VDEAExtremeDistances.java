@@ -5,20 +5,22 @@ import put.dea.common.ExtremeDistances;
 import put.dea.common.OptimizationSense;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class VDEAExtremeDistances extends VDEABase implements ExtremeDistances<VDEAProblemData> {
 
     @Override
     public double minDistance(VDEAProblemData data, int subjectDmuIdx) {
-        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE);
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, false);
     }
 
     @Override
     public double maxDistance(VDEAProblemData data, int subjectDmuIdx) {
-        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MAXIMIZE);
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MAXIMIZE, false);
     }
 
-    private double findMinOrMaxDistance(VDEAProblemData data, int subjectDmuIdx, OptimizationSense sense) {
+    private double findMinOrMaxDistance(VDEAProblemData data, int subjectDmuIdx, OptimizationSense sense, boolean superDistance) {
         var inputs = transformInputsToUtilities(data);
         var outputs = transformOutputsToUtilities(data);
         var model = makeModel(sense);
@@ -36,19 +38,32 @@ public class VDEAExtremeDistances extends VDEABase implements ExtremeDistances<V
         addSumWeightsToOneConstraint(model, inputWeights, outputWeights);
 
         for (int k = 0; k < data.getDmuCount(); k++) {
-            var constraint = createEffDistanceConstraint(model, inputs, outputs,
-                    subjectDmuIdx, k, inputWeights, outputWeights);
-            if (sense.isMaximize())
-                constraint.setLb(-C);
-            else
-                constraint.setUb(0);
+            if(!superDistance || k != subjectDmuIdx) {
+                var constraint = createEffDistanceConstraint(model, inputs, outputs,
+                        subjectDmuIdx, k, inputWeights, outputWeights);
+                if (sense.isMaximize())
+                    constraint.setLb(-C);
+                else
+                    constraint.setUb(0);
 
-            constraint.setCoefficient(dVariable, -1);
-            if (sense.isMaximize())
-                constraint.setCoefficient(binVariables[k], -C);
+                constraint.setCoefficient(dVariable, -1);
+                if (sense.isMaximize())
+                    constraint.setCoefficient(binVariables[k], -C);
+            }
         }
 
         addCustomWeightConstraints(data, model);
         return getModelResult(model);
+    }
+
+    public double superDistance(VDEAProblemData data, int subjectDmuIdx){
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, true);
+    }
+
+    public List<Double> superDistanceForAll(VDEAProblemData data){
+        return IntStream.range(0, data.getDmuCount())
+                .mapToDouble(idx-> superDistance(data, idx))
+                .boxed()
+                .toList();
     }
 }

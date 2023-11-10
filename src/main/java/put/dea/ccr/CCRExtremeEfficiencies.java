@@ -3,7 +3,6 @@ package put.dea.ccr;
 import com.google.ortools.linearsolver.MPConstraint;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
-import put.dea.ccr.imprecise.CCRImpreciseProblemData;
 import put.dea.common.ExtremeEfficiency;
 import put.dea.common.OptimizationSense;
 import put.dea.common.ProblemData;
@@ -88,13 +87,14 @@ public class CCRExtremeEfficiencies
         );
     }
 
+    public List<Double> superEfficiencyForAll(ProblemData data) {
+        return IntStream.range(0, data.getDmuCount())
+                .mapToDouble(idx -> superEfficiency(data, idx))
+                .boxed().toList();
+    }
+
     public double superEfficiency(ProblemData data, int subjectDmuIdx) {
         return findMaxOrSuperEfficiency(data, subjectDmuIdx, true);
-    }
-    public List<Double> superEfficiencyForAll(CCRImpreciseProblemData data){
-        return IntStream.range(0, data.getDmuCount())
-                .mapToDouble(idx->superEfficiency(data, idx))
-                .boxed().toList();
     }
 
 }

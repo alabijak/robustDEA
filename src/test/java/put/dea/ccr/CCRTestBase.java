@@ -1,6 +1,5 @@
 package put.dea.ccr;
 
-import com.google.ortools.Loader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import put.dea.common.ProblemData;
@@ -18,7 +17,6 @@ public class CCRTestBase {
 
     @BeforeAll
     public static void initialize() {
-        Loader.loadNativeLibraries();
         var inputs = new double[][]{
                 new double[]{10.5, 36, 129.4, 7},
                 new double[]{3.1, 19, 31.6, 7.9},

@@ -1,6 +1,5 @@
 package put.dea.vdea;
 
-import com.google.ortools.Loader;
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,6 @@ public class VDEATestBase {
 
     @BeforeAll
     public static void initialize() {
-        Loader.loadNativeLibraries();
         var inputs = new double[][]{
                 new double[]{2.026, 2.76, 0.92},
                 new double[]{1.959, 2.381, 0.774},

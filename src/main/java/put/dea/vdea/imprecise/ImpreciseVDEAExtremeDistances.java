@@ -60,22 +60,21 @@ public class ImpreciseVDEAExtremeDistances extends VDEABase
         impreciseCommonUtils.addFunctionRangeConstraints(model, data, preciseData, performanceVariables);
 
         for (int k = 0; k < data.getDmuCount(); k++) {
-            var constraint = impreciseCommonUtils.createImpreciseDistanceConstraint(model, data,
-                    subjectDmuIdx, k);
-            if (sense.isMaximize())
-                constraint.setLb(-C);
-            else
-                constraint.setUb(0);
+            if (!superDistance || k != subjectDmuIdx) {
+                var constraint = impreciseCommonUtils.createImpreciseDistanceConstraint(model, data,
+                        subjectDmuIdx, k);
+                if (sense.isMaximize())
+                    constraint.setLb(-C);
+                else
+                    constraint.setUb(0);
 
-            constraint.setCoefficient(dVariable, -1);
-            if (sense.isMaximize())
-                constraint.setCoefficient(binVariables[k], -C);
+                constraint.setCoefficient(dVariable, -1);
+                if (sense.isMaximize())
+                    constraint.setCoefficient(binVariables[k], -C);
+            }
         }
         addCustomWeightConstraints(data, model);
         return getModelResult(model);
-    }
-    public double superDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx){
-        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, true);
     }
 
     public List<Double> superDistanceForAll(ImpreciseVDEAProblemData data) {
@@ -83,6 +82,10 @@ public class ImpreciseVDEAExtremeDistances extends VDEABase
                 .mapToDouble(idx -> superDistance(data, idx))
                 .boxed()
                 .toList();
+    }
+
+    public double superDistance(ImpreciseVDEAProblemData data, int subjectDmuIdx) {
+        return findMinOrMaxDistance(data, subjectDmuIdx, OptimizationSense.MINIMIZE, true);
     }
 
 }

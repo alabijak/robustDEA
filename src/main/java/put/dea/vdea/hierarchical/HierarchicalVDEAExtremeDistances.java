@@ -1,9 +1,7 @@
 package put.dea.vdea.hierarchical;
 
 import put.dea.common.ExtremeDistances;
-import put.dea.common.OptimizationSense;
 import put.dea.vdea.VDEAExtremeDistances;
-import put.dea.vdea.imprecise.ImpreciseVDEAProblemData;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -48,10 +46,18 @@ public class HierarchicalVDEAExtremeDistances
         return maxDistance(data, subjectDmuIdx, data.getHierarchy().getName());
     }
 
-    public double superDistance(HierarchicalVDEAProblemData data, int subjectDmuIdx, String hierarchyLevel){
+    public double superDistance(HierarchicalVDEAProblemData data, int subjectDmuIdx) {
+        return superDistance(data, subjectDmuIdx, data.getHierarchy().getName());
+    }
+
+    public double superDistance(HierarchicalVDEAProblemData data, int subjectDmuIdx, String hierarchyLevel) {
         var dataForModel = data.prepareDataForModel(hierarchyLevel);
         var vdeaExtremeDistances = new VDEAExtremeDistances();
         return vdeaExtremeDistances.superDistance(dataForModel, subjectDmuIdx);
+    }
+
+    public List<Double> superDistanceForAll(HierarchicalVDEAProblemData data) {
+        return superDistanceForAll(data, data.getHierarchy().getName());
     }
 
     public List<Double> superDistanceForAll(HierarchicalVDEAProblemData data, String hierarchyLevel) {
@@ -59,13 +65,5 @@ public class HierarchicalVDEAExtremeDistances
                 .mapToDouble(idx -> superDistance(data, idx, hierarchyLevel))
                 .boxed()
                 .toList();
-    }
-
-    public double superDistance(HierarchicalVDEAProblemData data, int subjectDmuIdx){
-        return superDistance(data, subjectDmuIdx, data.getHierarchy().getName());
-    }
-
-    public List<Double> superDistanceForAll(HierarchicalVDEAProblemData data) {
-        return superDistanceForAll(data, data.getHierarchy().getName());
     }
 }

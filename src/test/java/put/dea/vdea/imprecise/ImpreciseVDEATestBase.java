@@ -1,6 +1,5 @@
 package put.dea.vdea.imprecise;
 
-import com.google.ortools.Loader;
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import put.dea.weightConstraints.Constraint;
@@ -16,7 +15,6 @@ public class ImpreciseVDEATestBase {
 
     @BeforeAll
     public static void initializeData() {
-        Loader.loadNativeLibraries();
         double[] minI1 = new double[]{24, 17, 23, 45, 15, 60, 35, 31, 28, 47, 50, 35};
         double[] maxI1 = new double[]{24, 19, 25, 51, 17, 65, 42, 31, 30, 50, 53, 38};
 

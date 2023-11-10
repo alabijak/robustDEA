@@ -1,6 +1,5 @@
 package put.dea.ccr.imprecise;
 
-import com.google.ortools.Loader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import put.dea.weightConstraints.Constraint;
@@ -17,7 +16,6 @@ public abstract class ImpreciseCCRTestBase {
 
     @BeforeAll
     public static void initializeData() {
-        Loader.loadNativeLibraries();
         var cost = new double[]{7.2, 4.8, 5, 7.2, 9.6, 1.07, 1.76, 3.2, 6.72, 2.4, 2.88, 6.9, 3.2, 4, 3.68, 6.88, 8, 6.3, 0.94, 0.16, 2.81, 3.8, 1.25, 1.37, 3.63, 5.3, 4};
         var reputation = new double[]{15, 7, 23, 16, 24, 3, 8, 17, 9, 2, 18, 10, 25, 19, 11, 20, 1, 21, 12, 5, 26, 13, 27, 14, 4, 22, 6};
         var capacityMin = new double[]{50, 60, 40, 1, 45, 1, 4, 10, 9, 5, 25, 10, 8, 20, 40, 75, 10, 9, 10, 1, 25, 0.8, 2, 1, 8, 65, 190};
