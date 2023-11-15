@@ -1,5 +1,10 @@
 package put.dea.robustness;
 
+
+/**
+ * Class providing methods for verification of presence of the necessary and possible efficiency preference relations
+ * for standard (precise) problems with VDEA efficiency model
+ */
 public class VDEAPreferenceRelations extends VDEABase implements PreferenceRelations<VDEAProblemData> {
     @Override
     public boolean isNecessarilyPreferred(VDEAProblemData data, int subjectDmuIdx, int relativeDmuIdx) {

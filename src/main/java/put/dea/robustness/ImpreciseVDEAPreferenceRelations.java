@@ -1,15 +1,32 @@
 package put.dea.robustness;
 
+/**
+ * Class providing methods for verification of presence of the necessary and possible efficiency preference relations
+ * in problems with imprecise information and VDEA efficiency model
+ */
 public class ImpreciseVDEAPreferenceRelations extends VDEABase
         implements PreferenceRelations<ImpreciseVDEAProblemData> {
 
     private final ImprecisePerformanceConverter performanceConverter;
     private final ImpreciseVDEAUtils impreciseCommonUtils;
 
-    ImpreciseVDEAPreferenceRelations() {
+    /**
+     * Creates a new object with default minimal ratios for ordinal factors (1.0001)
+     * and marginal functions (0.0001)
+     * and minimal ordinal performance (1.0)
+     */
+    public ImpreciseVDEAPreferenceRelations() {
         this(1.00001, 1e-4, 1.0);
     }
 
+    /**
+     * Creates a new object with given minimal ratios for ordinal factors and marginal function values
+     * and minimal ordinal performance
+     *
+     * @param alpha               minimal ratio between subsequent performances in ordinal factors
+     * @param epsilon             minimal performance for ordinal factors
+     * @param functionValuesAlpha minimal ratio between subsequent performances in marginal value function
+     */
     public ImpreciseVDEAPreferenceRelations(double alpha, double epsilon, double functionValuesAlpha) {
         impreciseCommonUtils = new ImpreciseVDEAUtils(alpha, epsilon, functionValuesAlpha);
         performanceConverter = new ImprecisePerformanceConverter();

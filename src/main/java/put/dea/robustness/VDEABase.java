@@ -8,7 +8,7 @@ import joinery.DataFrame;
 import java.util.List;
 
 abstract class VDEABase extends RobustnessLPBase {
-    public static final Double C = 10000.0;
+    protected static final Double C = 10000.0;
     private final PerformanceToValueConverter performanceConverter = new PerformanceToValueConverter();
 
     protected void addSumWeightsToOneConstraint(MPSolver model,

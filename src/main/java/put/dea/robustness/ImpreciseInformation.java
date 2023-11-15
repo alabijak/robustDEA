@@ -76,7 +76,7 @@ public class ImpreciseInformation {
     }
 
     /**
-     * sets the ordinal factors
+     * assigns the set of ordinal factor names to the data set specification
      *
      * @param ordinalFactors ordinal factors names
      */

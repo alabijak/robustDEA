@@ -3,6 +3,11 @@ package put.dea.robustness;
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
 
+/**
+ * Class providing methods for finding the extreme (minimal and maximal) ranks
+ * of analysed DMUs
+ * for standard (precise) problems with VDEA efficiency model
+ */
 public class VDEAExtremeRanks
         extends VDEABase
         implements ExtremeRanks<VDEAProblemData> {

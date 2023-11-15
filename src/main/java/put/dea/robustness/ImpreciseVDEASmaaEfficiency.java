@@ -2,14 +2,33 @@ package put.dea.robustness;
 
 import java.util.Random;
 
+/**
+ * Interface for methods for calculation the distribution of efficiency scores
+ * for problems with imprecise information and VDEA efficiency model
+ */
 public class ImpreciseVDEASmaaEfficiency extends VDEASmaaBase implements SmaaEfficiency<ImpreciseVDEAProblemData> {
 
     private final ImpreciseSmaaUtils impreciseSmaaUtils;
     private final int numberOfIntervals;
 
+    /**
+     * Creates a new object with given number of samples and number of intervals (buckets)
+     *
+     * @param numberOfSamples   number of samples
+     * @param numberOfIntervals number of intervals (buckets)
+     */
     public ImpreciseVDEASmaaEfficiency(int numberOfSamples, int numberOfIntervals) {
         this(numberOfSamples, numberOfIntervals, new Random());
     }
+
+    /**
+     * Creates a new object with given number of samples and number of intervals (buckets)
+     * and a specific {@link Random} object for sampling
+     *
+     * @param numberOfSamples   number of samples
+     * @param numberOfIntervals number of intervals (buckets)
+     * @param random            {@link Random} object for sampling
+     */
 
     public ImpreciseVDEASmaaEfficiency(int numberOfSamples, int numberOfIntervals, Random random) {
         super(numberOfSamples, random);

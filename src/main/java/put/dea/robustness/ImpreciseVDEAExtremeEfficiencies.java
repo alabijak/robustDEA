@@ -1,15 +1,33 @@
 package put.dea.robustness;
 
+/**
+ * Calculates the extreme (minimal and maximal) efficiency scores
+ * of analysed DMUs
+ * for problems with imprecise information and VDEA model
+ */
 public class ImpreciseVDEAExtremeEfficiencies extends VDEABase
         implements ExtremeEfficiency<ImpreciseVDEAProblemData> {
 
     private final ImprecisePerformanceConverter performanceConverter;
     private final ImpreciseVDEAUtils impreciseCommonUtils;
 
-    ImpreciseVDEAExtremeEfficiencies() {
+    /**
+     * Creates a new object with default minimal ratios for ordinal factors (1.0001)
+     * and marginal functions (0.0001)
+     * and minimal ordinal performance (1.0)
+     */
+    public ImpreciseVDEAExtremeEfficiencies() {
         this(1.00001, 1e-4, 1.0);
     }
 
+    /**
+     * Creates a new object with given minimal ratios for ordinal factors and marginal function values
+     * and minimal ordinal performance
+     *
+     * @param alpha               minimal ratio between subsequent performances in ordinal factors
+     * @param epsilon             minimal performance for ordinal factors
+     * @param functionValuesAlpha minimal ratio between subsequent performances in marginal value function
+     */
     public ImpreciseVDEAExtremeEfficiencies(double alpha, double epsilon, double functionValuesAlpha) {
         impreciseCommonUtils = new ImpreciseVDEAUtils(alpha, epsilon, functionValuesAlpha);
         performanceConverter = new ImprecisePerformanceConverter();

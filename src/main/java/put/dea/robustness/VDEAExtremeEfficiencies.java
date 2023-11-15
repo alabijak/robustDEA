@@ -1,5 +1,10 @@
 package put.dea.robustness;
 
+/**
+ * Class providing methods for finding the extreme (minimal and maximal) efficiency scores
+ * of analysed DMUs
+ * for standard (precise) problems with VDEA efficiency model
+ */
 public class VDEAExtremeEfficiencies
         extends VDEABase
         implements ExtremeEfficiency<VDEAProblemData> {

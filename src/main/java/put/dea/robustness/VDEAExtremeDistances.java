@@ -4,6 +4,11 @@ import com.google.ortools.linearsolver.MPVariable;
 
 import java.util.Arrays;
 
+/**
+ * Class providing methods for finding the extreme (minimal and maximal) efficiency distance
+ * of analysed DMU to the best one
+ * in standard (precise) problems with VDEA efficiency model
+ */
 public class VDEAExtremeDistances extends VDEABase implements ExtremeDistances<VDEAProblemData> {
 
     @Override

@@ -3,6 +3,10 @@ package put.dea.robustness;
 import static java.lang.Double.NEGATIVE_INFINITY;
 import static java.lang.Double.POSITIVE_INFINITY;
 
+/**
+ * Calculates the extreme (minimal and maximal) ranks
+ * of analysed DMUs in problems with imprecise information and VDEA model
+ */
 public class ImpreciseVDEAExtremeRanks extends VDEABase
         implements ExtremeRanks<ImpreciseVDEAProblemData> {
 
@@ -10,13 +14,28 @@ public class ImpreciseVDEAExtremeRanks extends VDEABase
     private final ImpreciseVDEAUtils impreciseCommonUtils;
     private final ExtremeRanksBase extremeRanksBase = new ExtremeRanksBase();
 
-    ImpreciseVDEAExtremeRanks() {
+    /**
+     * Creates a new object with default minimal ratios for ordinal factors (1.0001)
+     * and marginal functions (0.0001)
+     * and minimal ordinal performance (1.0)
+     */
+    public ImpreciseVDEAExtremeRanks() {
         this(1.00001, 1e-4, 1.0);
     }
 
+
+    /**
+     * Creates a new object with given minimal ratios for ordinal factors and marginal function values
+     * and minimal ordinal performance
+     *
+     * @param alpha               minimal ratio between subsequent performances in ordinal factors
+     * @param epsilon             minimal performance for ordinal factors
+     * @param functionValuesAlpha minimal ratio between subsequent performances in marginal value function
+     */
     public ImpreciseVDEAExtremeRanks(double alpha, double epsilon, double functionValuesAlpha) {
         impreciseCommonUtils = new ImpreciseVDEAUtils(alpha, epsilon, functionValuesAlpha);
     }
+
 
     @Override
     public int minRank(ImpreciseVDEAProblemData data, int subjectDmuIdx) {
@@ -30,8 +49,8 @@ public class ImpreciseVDEAExtremeRanks extends VDEABase
                 -C, POSITIVE_INFINITY);
     }
 
-    public int createModel(ImpreciseVDEAProblemData data, int subjectDmuIdx,
-                           OptimizationSense sense, Double constraintsLower, Double constraintUpper) {
+    private int createModel(ImpreciseVDEAProblemData data, int subjectDmuIdx,
+                            OptimizationSense sense, Double constraintsLower, Double constraintUpper) {
 
         var preciseData = performanceConverter.convertPerformanceToPrecise(data.getImpreciseInformation(),
                 subjectDmuIdx,
