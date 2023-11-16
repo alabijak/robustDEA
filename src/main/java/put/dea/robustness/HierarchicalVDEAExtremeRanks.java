@@ -18,8 +18,8 @@ public class HierarchicalVDEAExtremeRanks
      * @param hierarchyLevel level of the hierarchy of factors
      * @return {@link List} of minimal efficiency ranks for each DMU in the considered data set
      */
-    public List<Integer> minRanksForAll(HierarchicalVDEAProblemData data,
-                                        String hierarchyLevel) {
+    public List<Integer> minRankForAll(HierarchicalVDEAProblemData data,
+                                       String hierarchyLevel) {
         return IntStream.range(0, data.getDmuCount())
                 .mapToObj(dmu -> minRank(data, dmu, hierarchyLevel))
                 .toList();

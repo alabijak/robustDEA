@@ -35,21 +35,11 @@ public class ImpreciseVDEATestBase {
         var minOutputs = transposeArray(new double[][]{minO1, minO2});
         var maxOutputs = transposeArray(new double[][]{maxO1, maxO2});
 
-//        var minInputs = transposeArray(new double[][]{minI1, i2});
-//        var maxInputs = transposeArray(new double[][]{maxI1, i2});
-//        var minOutputs = transposeArray(new double[][]{minO1});
-//        var maxOutputs = transposeArray(new double[][]{maxO1});
-
-//        data = new ImpreciseVDEAProblemData(minInputs, minOutputs, maxInputs, maxOutputs,
-//                List.of("i1", "i2"),
-//                List.of("o1")
-//        );
         data = new ImpreciseVDEAProblemData(minInputs, minOutputs, maxInputs, maxOutputs,
                 List.of("i1", "i2", "i3", "i4"),
                 List.of("o1", "o2")
         );
         data.getImpreciseInformation().getOrdinalFactors().add("i2");
-//
         addFunctionShapes();
     }
 
@@ -149,7 +139,5 @@ public class ImpreciseVDEATestBase {
         data.getWeightConstraints().add(new Constraint(
                 ConstraintOperator.LEQ, 0.25, Map.of("o2", 1.0)
         ));
-
-
     }
 }

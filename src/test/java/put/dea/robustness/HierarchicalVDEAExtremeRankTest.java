@@ -17,7 +17,7 @@ public class HierarchicalVDEAExtremeRankTest extends HierarchicalVDEATestBase {
         var extremeRanks = new HierarchicalVDEAExtremeRanks();
         List<Integer> actual;
         if (minimal)
-            actual = extremeRanks.minRanksForAll(data, level);
+            actual = extremeRanks.minRankForAll(data, level);
         else
             actual = extremeRanks.maxRankForAll(data, level);
         Assertions.assertIterableEquals(Arrays.stream(expectedValues).boxed().toList(), actual);
