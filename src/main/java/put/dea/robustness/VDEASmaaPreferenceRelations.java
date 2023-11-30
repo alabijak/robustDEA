@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.Random;
 
@@ -31,7 +31,7 @@ public class VDEASmaaPreferenceRelations extends VDEASmaaBase implements SmaaPre
     }
 
     @Override
-    public DataFrame<Double> peoi(VDEAProblemData data) {
+    public Table peoi(VDEAProblemData data) {
         var inputs = performanceToValueConverter.transformInputsToUtilities(data);
         var outputs = performanceToValueConverter.transformOutputsToUtilities(data);
         var efficiencyMatrix = calculateEfficiencyMatrix(data, inputs, outputs);

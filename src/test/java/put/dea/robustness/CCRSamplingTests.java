@@ -1,9 +1,10 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.Arrays;
 
@@ -30,21 +31,22 @@ public class CCRSamplingTests extends CCRTestBase {
     }
 
     private void verifySamplesShape(WeightSamplesCollection samples) {
-        Assertions.assertEquals(data.getInputCount(), samples.getInputSamples().size());
-        Assertions.assertEquals(data.getOutputCount(), samples.getOutputSamples().size());
-        Assertions.assertEquals(sampling.getNumberOfSamples(), samples.getInputSamples().length());
-        Assertions.assertEquals(sampling.getNumberOfSamples(), samples.getOutputSamples().length());
+        Assertions.assertEquals(data.getInputCount(), samples.getInputSamples().columnCount());
+        Assertions.assertEquals(data.getOutputCount(), samples.getOutputSamples().columnCount());
+        Assertions.assertEquals(sampling.getNumberOfSamples(), samples.getInputSamples().rowCount());
+        Assertions.assertEquals(sampling.getNumberOfSamples(), samples.getOutputSamples().rowCount());
     }
 
-    private void verifySamplesSumToOne(DataFrame<Double> samples) {
-        for (var sample : samples) {
-            Assertions.assertEquals(1.0, sample.stream().mapToDouble(x -> x).sum(), 1e-6);
+    private void verifySamplesSumToOne(Table samples) {
+        samples = samples.transpose();
+        for (var sample : samples.columns().stream().map(x -> (DoubleColumn) x).toList()) {
+            Assertions.assertEquals(1.0, Arrays.stream(sample.asDoubleArray()).sum(), 1e-6);
         }
     }
 
-    private void verifyNonNegativeSamples(DataFrame<Double> inputSamples) {
+    private void verifyNonNegativeSamples(Table inputSamples) {
         Assertions.assertTrue(
-                Arrays.stream(inputSamples.toArray(new Double[0][]))
+                inputSamples.columns().stream().map(c -> ((DoubleColumn) c).asDoubleArray())
                         .allMatch(row -> Arrays.stream(row).allMatch(value -> value >= 0))
         );
     }
@@ -59,13 +61,13 @@ public class CCRSamplingTests extends CCRTestBase {
 
     private void verifyWeightConstrains(WeightSamplesCollection samples) {
         for (var sample : samples.getInputSamples()) {
-            Assertions.assertTrue(sample.get(0) >= 3 * sample.get(2));
-            Assertions.assertTrue(sample.get(0) >= 5 * sample.get(3));
-            Assertions.assertTrue(sample.get(1) >= 2 * sample.get(2));
-            Assertions.assertTrue(sample.get(1) >= 5 * sample.get(3));
+            Assertions.assertTrue(sample.getDouble(0) >= 3 * sample.getDouble(2));
+            Assertions.assertTrue(sample.getDouble(0) >= 5 * sample.getDouble(3));
+            Assertions.assertTrue(sample.getDouble(1) >= 2 * sample.getDouble(2));
+            Assertions.assertTrue(sample.getDouble(1) >= 5 * sample.getDouble(3));
         }
         for (var sample : samples.getOutputSamples()) {
-            Assertions.assertTrue(sample.get(0) >= 5 * sample.get(1));
+            Assertions.assertTrue(sample.getDouble(0) >= 5 * sample.getDouble(1));
         }
     }
 

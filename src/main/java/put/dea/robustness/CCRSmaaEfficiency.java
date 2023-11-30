@@ -1,10 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
-
-import java.util.List;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 /**
  * Finds the efficiency distribution (efficiency acceptability interval indices)
@@ -59,19 +55,6 @@ public class CCRSmaaEfficiency extends CCRSmaaBase implements SmaaEfficiency<Pro
         var distribution = efficiencyBase.calculateDistribution(normalizedEfficiencies);
         var expectedEfficiency = calculateExpectedValues(normalizedEfficiencies);
         return new DistributionResult(distribution, expectedEfficiency);
-    }
-
-    protected DataFrame<Double> normalizeEfficiencies(DataFrame<Double> efficiencies) {
-        var max = efficiencies.max().row(0);
-        return efficiencies.transform(row -> List.of(normalizeRow(row, max)));
-    }
-
-
-    private List<Double> normalizeRow(List<Double> row, List<Double> max) {
-        return IntStream.range(0, row.size())
-                .mapToDouble(idx -> row.get(idx) / max.get(idx))
-                .boxed()
-                .toList();
     }
 
 

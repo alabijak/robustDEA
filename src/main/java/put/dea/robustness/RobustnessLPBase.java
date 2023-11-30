@@ -4,7 +4,7 @@ import com.google.ortools.Loader;
 import com.google.ortools.linearsolver.MPConstraint;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.List;
 
@@ -60,9 +60,10 @@ abstract class RobustnessLPBase {
         }
     }
 
-    protected List<MPVariable> makeWeightVariables(MPSolver model, DataFrame<Double> data, double ub) {
-        return data.columns().stream()
-                .map(col -> model.makeNumVar(0, ub, col.toString()))
+    protected List<MPVariable> makeWeightVariables(MPSolver model, Table data, double ub) {
+        return data.columnNames()
+                .stream()
+                .map(column -> model.makeNumVar(0, ub, column))
                 .toList();
     }
 }

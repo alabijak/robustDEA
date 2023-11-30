@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.Random;
 
@@ -34,7 +34,7 @@ public class ImpreciseCCRSmaaPreferenceRelations extends CCRSmaaBase implements 
     }
 
     @Override
-    public DataFrame<Double> peoi(CCRImpreciseProblemData data) {
+    public Table peoi(CCRImpreciseProblemData data) {
         var weightSamples = generateWeightSamples(data);
         var performanceSamples = impreciseSmaaUtils.generatePerformanceSamples(
                 data.getImpreciseInformation(), false);

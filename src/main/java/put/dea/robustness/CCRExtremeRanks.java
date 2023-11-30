@@ -34,9 +34,9 @@ public class CCRExtremeRanks extends CCRRobustnessBase implements ExtremeRanks<P
                 var constraint = model.makeConstraint(constraintsLower, constraintUpper);
                 constraint.setCoefficient(binVariables[k], C);
                 for (int i = 0; i < inputWeights.size(); i++)
-                    constraint.setCoefficient(inputWeights.get(i), data.getInputData().get(k, i));
+                    constraint.setCoefficient(inputWeights.get(i), data.getInputData().row(k).getDouble(i));
                 for (int i = 0; i < outputWeights.size(); i++)
-                    constraint.setCoefficient(outputWeights.get(i), -data.getOutputData().get(k, i));
+                    constraint.setCoefficient(outputWeights.get(i), -data.getOutputData().row(k).getDouble(i));
             }
         }
         addCustomWeightConstraints(data, model);

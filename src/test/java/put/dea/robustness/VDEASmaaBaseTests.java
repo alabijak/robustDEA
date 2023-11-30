@@ -52,7 +52,7 @@ public class VDEASmaaBaseTests extends VDEATestBase {
         var inputs = smaaBase.performanceToValueConverter.transformInputsToUtilities(data);
         var outputs = smaaBase.performanceToValueConverter.transformOutputsToUtilities(data);
         var actualEfficiencies = smaaBase.calculateEfficiencyMatrixForSamples(inputs, outputs, samples);
-        assert2DDoubleArrayEquals(efficiencies, actualEfficiencies.toModelMatrix(0));
+        assert2DDoubleArrayEquals(efficiencies, TestUtils.tranformTableToArray(actualEfficiencies));
     }
 
     private void assert2DDoubleArrayEquals(double[][] expected, double[][] actual) {
@@ -87,8 +87,7 @@ public class VDEASmaaBaseTests extends VDEATestBase {
         };
         var inputs = smaaBase.performanceToValueConverter.transformInputsToUtilities(data);
         var outputs = smaaBase.performanceToValueConverter.transformOutputsToUtilities(data);
-        var actualEfficiencies = smaaBase.calculateEfficiencyMatrix(data, inputs, outputs)
-                .toModelMatrix(0);
+        var actualEfficiencies = TestUtils.tranformTableToArray(smaaBase.calculateEfficiencyMatrix(data, inputs, outputs));
         assert2DDoubleArrayEquals(expected, actualEfficiencies);
     }
 

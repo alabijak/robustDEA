@@ -1,10 +1,9 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
 
 class SmaaEfficiencyBase {
 
@@ -16,16 +15,20 @@ class SmaaEfficiencyBase {
         this.numberOfSamples = numberOfSamples;
     }
 
-    public DataFrame<Double> calculateDistribution(DataFrame<Double> efficiencies) {
-        var distribution = new DataFrame<Double>(IntStream.range(0, numberOfIntervals).mapToObj(idx -> "interval" + idx).toList());
-        efficiencies.forEach(row -> distribution.append(calculateDistributionForRow(row)));
-        return distribution;
+    public Table calculateDistribution(Table efficiencies) {
+        var distribution = Table.create();
+        efficiencies.transpose().columns()
+                .stream()
+                .map(column -> calculateDistributionForRow((DoubleColumn) column))
+                .forEach(values -> distribution.addColumns(
+                        DoubleColumn.create(distribution.columnCount() + "", values)));
+        return distribution.transpose();
     }
 
-    private List<Double> calculateDistributionForRow(List<Double> row) {
+    private double[] calculateDistributionForRow(DoubleColumn efficiencies) {
         var distribution = new double[numberOfIntervals];
-        var indices = row.stream().map(x -> (int) Math.max(Math.ceil(x * numberOfIntervals) - 1, 0));
-        indices.forEach(idx -> distribution[idx] += 1);
-        return Arrays.stream(distribution).map(x -> x / numberOfSamples).boxed().toList();
+        var indices = efficiencies.map(x -> Math.max(Math.ceil(x * numberOfIntervals) - 1, 0));
+        indices.forEach(idx -> distribution[idx.intValue()] += 1);
+        return Arrays.stream(distribution).map(x -> x / numberOfSamples).toArray();
     }
 }

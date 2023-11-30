@@ -1,8 +1,9 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
-import java.util.stream.IntStream;
+import java.util.function.Predicate;
 
 class SmaaPreferenceRelationsBase {
     private final int numberOfSamples;
@@ -11,20 +12,20 @@ class SmaaPreferenceRelationsBase {
         this.numberOfSamples = numberOfSamples;
     }
 
-    public DataFrame<Double> calculatePeois(DataFrame<Double> efficiencies) {
-        var peoi = new DataFrame<Double>(efficiencies.index().stream().map(Object::toString).toList());
 
-        for (int dmuA = 0; dmuA < efficiencies.length(); dmuA++) {
-            var efficienciesA = efficiencies.row(dmuA);
-            var row = IntStream.range(0, efficiencies.length())
-                    .mapToDouble(dmuB ->
-                            IntStream.range(0, efficiencies.size())
-                                    .filter(sampleIdx -> efficienciesA.get(sampleIdx) >= efficiencies.get(dmuB, sampleIdx))
-                                    .count())
-                    .map(count -> count / numberOfSamples)
-                    .boxed()
-                    .toList();
-            peoi.append(row);
+    public Table calculatePeois(Table efficiencies) {
+        var peoi = Table.create();
+        efficiencies = efficiencies.transpose();
+
+        for (int dmuB = 0; dmuB < efficiencies.columnCount(); dmuB++) {
+            var efficienciesB = efficiencies.doubleColumn(dmuB);
+            var values = new double[efficiencies.columnCount()];
+            for (int dmuA = 0; dmuA < efficiencies.columnCount(); dmuA++) {
+                var efficienciesA = efficiencies.doubleColumn(dmuA);
+                var count = efficienciesA.subtract(efficienciesB).count((Predicate<? super Double>) x -> x >= 0.0);
+                values[dmuA] = (double) count / numberOfSamples;
+            }
+            peoi.addColumns(DoubleColumn.create(dmuB + "", values));
         }
         return peoi;
 

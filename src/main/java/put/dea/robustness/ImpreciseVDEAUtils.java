@@ -24,13 +24,13 @@ class ImpreciseVDEAUtils extends ImpreciseCommonUtils {
                                             ImpreciseVDEAProblemData data,
                                             ProblemData preciseData,
                                             Map<String, List<MPVariable>> variables) {
-        data.getInputNames()
+        data.getInputData().columnNames()
                 .stream()
                 .filter(input -> !data.getImpreciseInformation().getOrdinalFactors().contains(input))
                 .forEach(input -> addFunctionRangeConstraintsForColumn(
                         model, input, data, preciseData, variables.get(input), true
                 ));
-        data.getOutputNames()
+        data.getOutputData().columnNames()
                 .stream()
                 .filter(output -> !data.getImpreciseInformation().getOrdinalFactors().contains(output))
                 .forEach(output -> addFunctionRangeConstraintsForColumn(
@@ -64,17 +64,14 @@ class ImpreciseVDEAUtils extends ImpreciseCommonUtils {
             constraint.setCoefficient(variable, 1);
             constraint.setCoefficient(weightVariable, -upperValues.get(dmu));
         }
-        var alpha = this.alpha;
-        this.alpha = functionValuesAlpha;
-        addMonotonicityConstraints(model, preciseData, column, input);
-        this.alpha = alpha;
+        addMonotonicityConstraints(model, preciseData, column, input, functionValuesAlpha);
     }
 
     public Map<String, List<MPVariable>> makeOrdinalAndFunctionRangeVariables(MPSolver model, ImpreciseVDEAProblemData data) {
         var result = new HashMap<String, List<MPVariable>>();
-        data.getInputNames()
+        data.getInputData().columnNames()
                 .forEach(input -> result.put(input, makeFunctionRangeVariables(model, input, data.getDmuCount())));
-        data.getOutputNames()
+        data.getOutputData().columnNames()
                 .forEach(output -> result.put(output, makeFunctionRangeVariables(model, output, data.getDmuCount())));
         return result;
     }
@@ -90,11 +87,12 @@ class ImpreciseVDEAUtils extends ImpreciseCommonUtils {
             ImpreciseVDEAProblemData data,
             int subjectDmuIdx,
             int relativeDmuIdx) {
+
         var constraint = model.makeConstraint();
-        var allColumns = new HashSet<>(data.getInputNames());
-        allColumns.addAll(data.getOutputNames());
-        for (var factor : allColumns) {
-            if (relativeDmuIdx != subjectDmuIdx) {
+        if (relativeDmuIdx != subjectDmuIdx) {
+            var allColumns = new HashSet<>(data.getInputData().columnNames());
+            allColumns.addAll(data.getOutputData().columnNames());
+            for (var factor : allColumns) {
                 var subjectVariable = model.lookupVariableOrNull(factor + "_" + subjectDmuIdx);
                 var relativeVariable = model.lookupVariableOrNull(factor + "_" + relativeDmuIdx);
                 constraint.setCoefficient(subjectVariable, -1);
@@ -108,7 +106,7 @@ class ImpreciseVDEAUtils extends ImpreciseCommonUtils {
                                            ImpreciseInformation impreciseInformation) {
         impreciseInformation.getOrdinalFactors()
                 .forEach(factor -> addMonotonicityConstraints(model, impreciseInformation.getData(), factor,
-                        impreciseInformation.getData().getInputNames().contains(factor)));
+                        impreciseInformation.getData().getInputData().containsColumn(factor)));
     }
 
     @Override

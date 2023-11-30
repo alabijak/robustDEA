@@ -1,34 +1,34 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
 import org.apache.commons.math3.util.Pair;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.Comparator;
 import java.util.List;
 
 class PerformanceToValueConverter {
-    public DataFrame<Double> transformInputsToUtilities(VDEAProblemData data) {
+    public Table transformInputsToUtilities(VDEAProblemData data) {
         return transformPerformanceToUtilities(data, true);
     }
 
-    private DataFrame<Double> transformPerformanceToUtilities(VDEAProblemData data,
-                                                              boolean input) {
-        DataFrame<Double> utilities = new DataFrame<>();
+    private Table transformPerformanceToUtilities(VDEAProblemData data,
+                                                  boolean input) {
+        Table utilities = Table.create();
         var performances = input ? data.getInputData() : data.getOutputData();
-        for (var columnName : performances.columns()) {
-            var shape = data.getFunctionShape(columnName.toString());
+        for (var columnName : performances.columnNames()) {
+            var shape = data.getFunctionShape(columnName);
             var df = input ? data.getInputData() : data.getOutputData();
-            utilities.add(columnName,
-                    transformColumnToUtilities(df, columnName.toString(), shape));
+            utilities.addColumns(transformColumnToUtilities(df, columnName, shape));
         }
         return utilities;
     }
 
-    public List<Double> transformColumnToUtilities(DataFrame<Double> data,
+    public DoubleColumn transformColumnToUtilities(Table data,
                                                    String columnName,
                                                    List<Pair<Double, Double>> shape) {
         var sortedShape = shape.stream().sorted(Comparator.comparing(Pair::getFirst)).toList();
-        return data.col(columnName).stream().map(v -> transformValueToUtilities(v, sortedShape)).toList();
+        return data.doubleColumn(columnName).map(v -> transformValueToUtilities(v, sortedShape));
     }
 
     private Double transformValueToUtilities(Double value,
@@ -45,7 +45,7 @@ class PerformanceToValueConverter {
         throw new IllegalArgumentException("Given input/output value out of defined column bounds");
     }
 
-    public DataFrame<Double> transformOutputsToUtilities(VDEAProblemData data) {
+    public Table transformOutputsToUtilities(VDEAProblemData data) {
         return transformPerformanceToUtilities(data, false);
     }
 }

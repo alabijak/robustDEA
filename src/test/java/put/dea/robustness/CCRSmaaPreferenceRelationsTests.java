@@ -29,7 +29,7 @@ public class CCRSmaaPreferenceRelationsTests extends CCRTestBase {
                 new double[]{0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1},
                 new double[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
         };
-        var result = preferenceRelations.peoi(data).toModelMatrix(0);
+        var result = TestUtils.tranformTableToArray(preferenceRelations.peoi(data));
         Assertions.assertArrayEquals(peoi, result);
     }
 }

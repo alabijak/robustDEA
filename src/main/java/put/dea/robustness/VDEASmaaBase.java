@@ -1,12 +1,14 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 abstract class VDEASmaaBase extends SmaaBase {
 
@@ -16,16 +18,21 @@ abstract class VDEASmaaBase extends SmaaBase {
         super(numberOfSamples, random);
     }
 
-    protected DataFrame<Double> calculateEfficiencyMatrix(ProblemData data, DataFrame<Double> inputValues, DataFrame<Double> outputValues) {
+    protected Table calculateEfficiencyMatrix(ProblemData data, Table inputValues, Table outputValues) {
         var samples = generateWeightSamples(data);
         return calculateEfficiencyMatrixForSamples(inputValues, outputValues, samples);
     }
 
     @Override
-    protected double calculateEfficiency(DataFrame<Double> inputs, DataFrame<Double> outputs,
-                                         List<Double> inputsSample, List<Double> outputsSample, int dmuIdx) {
-        return calculateWeightedSum(Stream.concat(inputs.row(dmuIdx).stream(), outputs.row(dmuIdx).stream()).toList(),
-                Stream.concat(inputsSample.stream(), outputsSample.stream()).toList());
+    protected double calculateEfficiency(Table inputs, Table outputs,
+                                         Row inputsSample, Row outputsSample, int dmuIdx) {
+        var efficiency = IntStream.range(0, inputs.columnCount())
+                .mapToDouble(idx -> inputs.row(dmuIdx).getDouble(idx) * inputsSample.getDouble(idx))
+                .sum();
+        efficiency += IntStream.range(0, outputs.columnCount())
+                .mapToDouble(idx -> outputs.row(dmuIdx).getDouble(idx) * outputsSample.getDouble(idx))
+                .sum();
+        return efficiency;
     }
 
     @Override
@@ -41,19 +48,17 @@ abstract class VDEASmaaBase extends SmaaBase {
         );
     }
 
-    protected DataFrame<Double> calculateDistanceMatrix(DataFrame<Double> efficiencyMatrix) {
-        var best = efficiencyMatrix.max().row(0);
-        var distanceMatrix = new DataFrame<Double>(efficiencyMatrix.columns());
-        efficiencyMatrix
-                .iterrows()
-                .forEachRemaining(row -> distanceMatrix.append(calculateDistancesForRow(row, best)));
-        return distanceMatrix;
+    protected Table calculateDistanceMatrix(Table efficiencyMatrix) {
+        return Table.create(
+                efficiencyMatrix.columns()
+                        .stream()
+                        .map(this::calculateDistancesForColumn)
+        );
     }
 
-    private List<Double> calculateDistancesForRow(List<Double> row, List<Double> best) {
-        return IntStream.range(0, row.size())
-                .mapToDouble(idx -> best.get(idx) - row.get(idx))
-                .boxed()
-                .toList();
+    private DoubleColumn calculateDistancesForColumn(Column<?> column) {
+        var doubleColumn = (DoubleColumn) column;
+        var max = doubleColumn.max();
+        return doubleColumn.map(v -> max - v);
     }
 }

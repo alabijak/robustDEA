@@ -30,13 +30,15 @@ public class CCRPreferenceRelations extends CCRRobustnessBase implements Prefere
         var objective = model.objective();
         IntStream.range(0, outputWeights.size())
                 .forEach(idx -> objective.setCoefficient(outputWeights.get(idx),
-                        data.getOutputData().get(subjectDmuIdx, idx)));
+                        data.getOutputData().row(subjectDmuIdx).getDouble(idx)));
 
         var constraint = model.makeConstraint(0, 0);
         IntStream.range(0, data.getInputCount())
-                .forEach(idx -> constraint.setCoefficient(inputWeights.get(idx), data.getInputData().get(relativeDmuIdx, idx)));
+                .forEach(idx -> constraint.setCoefficient(inputWeights.get(idx),
+                        data.getInputData().row(relativeDmuIdx).getDouble(idx)));
         IntStream.range(0, data.getOutputCount())
-                .forEach(idx -> constraint.setCoefficient(outputWeights.get(idx), -data.getOutputData().get(relativeDmuIdx, idx)));
+                .forEach(idx -> constraint.setCoefficient(outputWeights.get(idx),
+                        -data.getOutputData().row(relativeDmuIdx).getDouble(idx)));
         addCustomWeightConstraints(data, model);
         return getModelResult(model) >= 1 - EPSILON;
     }

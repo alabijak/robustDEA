@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.Random;
 
@@ -32,7 +32,7 @@ public class CCRSmaaPreferenceRelations extends CCRSmaaBase implements SmaaPrefe
     }
 
     @Override
-    public DataFrame<Double> peoi(ProblemData data) {
+    public Table peoi(ProblemData data) {
         var preferenceRelationsBase = new SmaaPreferenceRelationsBase(numberOfSamples);
         var efficiencies = calculateEfficiencyMatrix(data);
         return preferenceRelationsBase.calculatePeois(efficiencies);

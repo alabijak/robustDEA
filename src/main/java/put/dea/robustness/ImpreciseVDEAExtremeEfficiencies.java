@@ -55,11 +55,11 @@ public class ImpreciseVDEAExtremeEfficiencies extends VDEABase
 
         var objective = model.objective();
         objective.setOptimizationDirection(sense.isMaximize());
-        for (var input : data.getInputNames()) {
+        for (var input : data.getInputData().columnNames()) {
             var subjectVariable = model.lookupVariableOrNull(input + "_" + subjectDmuIdx);
             objective.setCoefficient(subjectVariable, 1);
         }
-        for (var output : data.getOutputNames()) {
+        for (var output : data.getOutputData().columnNames()) {
             var subjectVariable = model.lookupVariableOrNull(output + "_" + subjectDmuIdx);
             objective.setCoefficient(subjectVariable, 1);
         }

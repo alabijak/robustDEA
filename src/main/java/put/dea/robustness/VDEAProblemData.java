@@ -1,8 +1,8 @@
 package put.dea.robustness;
 
 import org.apache.commons.math3.util.Pair;
+import tech.tablesaw.api.Table;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +39,10 @@ public class VDEAProblemData extends ProblemData {
                            List<String> inputNames,
                            List<String> outputNames) {
         super(inputData, outputData, inputNames, outputNames);
+    }
+
+    VDEAProblemData(Table inputData, Table outputData) {
+        super(inputData, outputData);
     }
 
     /**
@@ -104,12 +108,12 @@ public class VDEAProblemData extends ProblemData {
                                                           String column) {
         if (shapes.containsKey(column))
             return shapes.get(column);
-        if (this.getInputData().columns().contains(column))
+        if (this.getInputData().containsColumn(column))
             return List.of(
                     new Pair<>(getLowerBound(column), 1.0),
                     new Pair<>(getUpperBound(column), 0.0)
             );
-        if (this.getOutputData().columns().contains(column))
+        if (this.getOutputData().containsColumn(column))
             return List.of(
                     new Pair<>(getLowerBound(column), 0.0),
                     new Pair<>(getUpperBound(column), 1.0)
@@ -126,12 +130,10 @@ public class VDEAProblemData extends ProblemData {
     public Double getLowerBound(String column) {
         if (this.lowerBounds.containsKey(column))
             return this.lowerBounds.get(column);
-        if (this.getInputData().columns().contains(column))
-            return this.getInputData().col(column).stream().min(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
-        if (this.getOutputData().columns().contains(column))
-            return this.getOutputData().col(column).stream().min(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
+        if (this.getInputData().containsColumn(column))
+            return this.getInputData().doubleColumn(column).min();
+        if (this.getOutputData().containsColumn(column))
+            return this.getOutputData().doubleColumn(column).min();
         throw new IllegalArgumentException("Column with given name does not exist");
     }
 
@@ -144,12 +146,10 @@ public class VDEAProblemData extends ProblemData {
     public Double getUpperBound(String column) {
         if (this.upperBounds.containsKey(column))
             return this.upperBounds.get(column);
-        if (this.getInputData().columns().contains(column))
-            return this.getInputData().col(column).stream().max(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
-        if (this.getOutputData().columns().contains(column))
-            return this.getOutputData().col(column).stream().max(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
+        if (this.getInputData().containsColumn(column))
+            return this.getInputData().doubleColumn(column).max();
+        if (this.getOutputData().containsColumn(column))
+            return this.getOutputData().doubleColumn(column).max();
         throw new IllegalArgumentException("Column with given name does not exist");
     }
 

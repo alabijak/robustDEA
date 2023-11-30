@@ -1,6 +1,10 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
+import tech.tablesaw.columns.Column;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,14 +19,20 @@ abstract class CCRSmaaBase extends SmaaBase {
     }
 
     @Override
-    protected double calculateEfficiency(DataFrame<Double> inputs,
-                                         DataFrame<Double> outputs,
-                                         List<Double> inputsSample,
-                                         List<Double> outputsSample,
+    protected double calculateEfficiency(Table inputs,
+                                         Table outputs,
+                                         Row inputsSample,
+                                         Row outputsSample,
                                          int dmuIdx) {
         var inputsValue = calculateWeightedSum(inputs.row(dmuIdx), inputsSample);
         var outputsValue = calculateWeightedSum(outputs.row(dmuIdx), outputsSample);
         return outputsValue / inputsValue;
+    }
+
+    private double calculateWeightedSum(Row performances, Row weights) {
+        return IntStream.range(0, performances.columnCount())
+                .mapToDouble(idx -> performances.getDouble(idx) * weights.getDouble(idx))
+                .sum();
     }
 
     @Override
@@ -50,17 +60,14 @@ abstract class CCRSmaaBase extends SmaaBase {
                 .toArray();
     }
 
-    protected DataFrame<Double> normalizeEfficiencies(DataFrame<Double> efficiencies) {
-        var max = efficiencies.max().row(0);
-        return efficiencies.transform(row -> List.of(normalizeRow(row, max)));
+    protected Table normalizeEfficiencies(Table efficiencies) {
+        return Table.create(efficiencies.columns().stream().map(this::normalizeColumn));
     }
 
-    private List<Double> normalizeRow(List<Double> row, List<Double> max) {
-        return IntStream.range(0, row.size())
-                .mapToDouble(idx -> row.get(idx) / max.get(idx))
-                .boxed()
-                .toList();
+    private DoubleColumn normalizeColumn(Column<?> column) {
+        var doubleColumn = (DoubleColumn) column;
+        var max = doubleColumn.max();
+        return doubleColumn.divide(max);
     }
-
 
 }

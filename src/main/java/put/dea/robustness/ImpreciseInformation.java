@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -11,8 +11,8 @@ import java.util.Set;
 public class ImpreciseInformation {
     private final double tolerance;
     private final ProblemData data;
-    private DataFrame<Double> maxInputs;
-    private DataFrame<Double> maxOutputs;
+    private Table maxInputs;
+    private Table maxOutputs;
     private Set<String> ordinalFactors = new HashSet<>();
 
     /**
@@ -22,7 +22,7 @@ public class ImpreciseInformation {
      * @param maxInputs  maximal input performances
      * @param maxOutputs maximal output performances
      */
-    public ImpreciseInformation(ProblemData data, DataFrame<Double> maxInputs, DataFrame<Double> maxOutputs) {
+    public ImpreciseInformation(ProblemData data, Table maxInputs, Table maxOutputs) {
         this(data, 0.0);
         this.maxInputs = maxInputs;
         this.maxOutputs = maxOutputs;
@@ -44,7 +44,7 @@ public class ImpreciseInformation {
      *
      * @return maximal input performances
      */
-    public DataFrame<Double> getMaxInputs() {
+    public Table getMaxInputs() {
         return maxInputs;
     }
 
@@ -53,7 +53,7 @@ public class ImpreciseInformation {
      *
      * @return maximal output performances
      */
-    public DataFrame<Double> getMaxOutputs() {
+    public Table getMaxOutputs() {
         return maxOutputs;
     }
 

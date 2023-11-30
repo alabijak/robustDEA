@@ -29,6 +29,7 @@ public class ImpreciseVDEASmaaPreferenceRelationsTests extends ImpreciseVDEATest
         var distribution = smaaPreferences.peoi(data);
         IntStream.range(0, data.getDmuCount())
                 .forEach(idx -> Assertions.assertArrayEquals(expectedDistribution[idx],
-                        distribution.row(idx).stream().mapToDouble(x -> x).toArray(), 1e-6));
+                        TestUtils.tranformTableToArray(distribution)[idx],
+                        1e-6));
     }
 }

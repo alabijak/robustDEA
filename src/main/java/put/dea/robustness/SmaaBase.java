@@ -1,12 +1,14 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
 import polyrun.PolytopeRunner;
 import polyrun.constraints.ConstraintsSystem;
 import polyrun.exceptions.InfeasibleSystemException;
 import polyrun.exceptions.UnboundedSystemException;
 import polyrun.sampling.HitAndRun;
 import polyrun.thinning.NCubedThinningFunction;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,11 +34,15 @@ abstract class SmaaBase {
         return numberOfSamples;
     }
 
-    protected List<Double> calculateExpectedValues(DataFrame<Double> distribution) {
-        return distribution.transpose().mean().row(0);
+    protected List<Double> calculateExpectedValues(Table distribution) {
+        return distribution
+                .transpose()
+                .columns().stream().mapToDouble(column -> ((DoubleColumn) column).mean())
+                .boxed()
+                .toList();
     }
 
-    protected DataFrame<Double> calculateEfficiencyMatrix(ProblemData data) {
+    protected Table calculateEfficiencyMatrix(ProblemData data) {
         var samples = generateWeightSamples(data);
         return calculateEfficiencyMatrixForSamples(data.getInputData(), data.getOutputData(), samples);
     }
@@ -47,22 +53,26 @@ abstract class SmaaBase {
         return new WeightSamplesCollection(samples, data.getInputCount());
     }
 
-    protected DataFrame<Double> calculateEfficiencyMatrixForSamples(DataFrame<Double> inputs,
-                                                                    DataFrame<Double> outputs,
-                                                                    WeightSamplesCollection samples) {
-        var efficiencies = new DataFrame<Double>(IntStream.range(0, numberOfSamples).mapToObj(x -> "sample" + x).toList());
-        for (int dmu = 0; dmu < inputs.length(); dmu++) {
+    protected Table calculateEfficiencyMatrixForSamples(Table inputs,
+                                                        Table outputs,
+                                                        WeightSamplesCollection samples) {
+        var efficiencies = Table.create();
+        for (int dmu = 0; dmu < inputs.rowCount(); dmu++) {
             var dmuIdx = dmu;
-            efficiencies.append(IntStream.range(0, numberOfSamples)
-                    .mapToObj(idx -> calculateEfficiency(inputs,
-                            outputs,
-                            samples.getInputSamples().row(idx),
-                            samples.getOutputSamples().row(idx),
-                            dmuIdx))
-                    .toList());
+            efficiencies.addColumns(
+                    DoubleColumn.create(dmuIdx + "",
+                            IntStream.range(0, numberOfSamples)
+                                    .mapToDouble(idx -> calculateEfficiency(inputs,
+                                            outputs,
+                                            samples.getInputSamples().row(idx),
+                                            samples.getOutputSamples().row(idx),
+                                            dmuIdx))
+                                    .toArray()
+                    )
+            );
         }
 
-        return efficiencies;
+        return efficiencies.transpose();
     }
 
     private ConstraintsSystem prepareConstraintsSystem(ProblemData data) {
@@ -82,10 +92,10 @@ abstract class SmaaBase {
         return generateSamples(constraints, this.numberOfSamples);
     }
 
-    protected abstract double calculateEfficiency(DataFrame<Double> inputs,
-                                                  DataFrame<Double> outputs,
-                                                  List<Double> inputsSample,
-                                                  List<Double> outputsSample,
+    protected abstract double calculateEfficiency(Table inputs,
+                                                  Table outputs,
+                                                  Row inputsSample,
+                                                  Row outputsSample,
                                                   int dmuIdx);
 
     private List<double[]> createNonNegativeConstrains(ProblemData data) {
@@ -142,9 +152,5 @@ abstract class SmaaBase {
         return lhs;
     }
 
-    protected double calculateWeightedSum(List<Double> performances, List<Double> weights) {
-        return IntStream.range(0, performances.size())
-                .mapToDouble(idx -> performances.get(idx) * weights.get(idx))
-                .sum();
-    }
+
 }

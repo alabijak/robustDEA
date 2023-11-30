@@ -1,9 +1,10 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
 import org.apache.commons.math3.util.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.Comparator;
 import java.util.List;
@@ -17,12 +18,12 @@ public class ImpreciseSmaaSamplingTests extends ImpreciseCCRTestBase {
                 SmaaTestUtils.NUMBER_OF_INTERVALS,
                 SmaaTestUtils.getRandom()));
         var samples = smaaUtils.generatePerformanceSamples(data.getImpreciseInformation(), false);
-        verifyOrdinalInput(samples.getInputPerformances().stream().map(x -> x.col("reputation")).toList());
-        verifyIntervalOutput(samples.getOutputPerformances().stream().map(x -> x.col("capacity")).toList());
+        verifyOrdinalInput(samples.getInputPerformances().stream().map(x -> x.doubleColumn("reputation")).toList());
+        verifyIntervalOutput(samples.getOutputPerformances().stream().map(x -> x.doubleColumn("capacity")).toList());
         verifyPreciseFactors(samples);
     }
 
-    private void verifyOrdinalInput(List<List<Double>> reputation) {
+    private void verifyOrdinalInput(List<DoubleColumn> reputation) {
         var expectedSortedIndices = new int[]{16, 9, 5, 24, 19, 26, 1, 6, 8, 11, 14, 18, 21,
                 23, 0, 3, 7, 10, 13, 15, 17, 25, 2, 4, 12, 20, 22};
         for (var sample : reputation) {
@@ -38,9 +39,9 @@ public class ImpreciseSmaaSamplingTests extends ImpreciseCCRTestBase {
 
     }
 
-    private void verifyIntervalOutput(List<List<Double>> capacity) {
-        var expectedMinValues = data.getOutputData().col("capacity");
-        var expectedMaxValues = data.getImpreciseInformation().getMaxOutputs().col("capacity");
+    private void verifyIntervalOutput(List<DoubleColumn> capacity) {
+        var expectedMinValues = data.getOutputData().doubleColumn("capacity");
+        var expectedMaxValues = data.getImpreciseInformation().getMaxOutputs().doubleColumn("capacity");
         for (var sample : capacity) {
             for (int i = 0; i < data.getDmuCount(); i++) {
                 Assertions.assertTrue(sample.get(i) >= expectedMinValues.get(i));
@@ -51,17 +52,17 @@ public class ImpreciseSmaaSamplingTests extends ImpreciseCCRTestBase {
 
     private void verifyPreciseFactors(PerformanceSamplesCollection samples) {
         var actualVelocity = samples.getOutputPerformances()
-                .stream().map(x -> x.col("velocity"))
+                .stream().map(x -> x.doubleColumn("velocity"))
                 .toList();
         for (var sample : actualVelocity) {
-            Assertions.assertIterableEquals(data.getOutputData().col("velocity"), sample);
+            Assertions.assertIterableEquals(data.getOutputData().doubleColumn("velocity"), sample);
         }
 
         var actualCost = samples.getInputPerformances()
-                .stream().map(x -> x.col("cost"))
+                .stream().map(x -> x.doubleColumn("cost"))
                 .toList();
         for (var sample : actualCost) {
-            Assertions.assertIterableEquals(data.getInputData().col("cost"), sample);
+            Assertions.assertIterableEquals(data.getInputData().doubleColumn("cost"), sample);
         }
     }
 
@@ -112,16 +113,21 @@ public class ImpreciseSmaaSamplingTests extends ImpreciseCCRTestBase {
         var performanceSamples = new PerformanceSamplesCollection();
 
         for (int i = 0; i < 10; i++) {
-            var inputSample = new DataFrame<Double>("i1", "i2");
-            var outputSample = new DataFrame<Double>("i1", "i2");
+            var inputSample = Table.create();
+            var outputSample = Table.create();
+
             for (int dmu = 0; dmu < 5; dmu++) {
-                inputSample.append(List.of(i1Performance[dmu], i2Samples[i][dmu]));
+                inputSample.addColumns(
+                        DoubleColumn.create(dmu + "", List.of(i1Performance[dmu], i2Samples[i][dmu]))
+                );
             }
             for (int dmu = 0; dmu < 5; dmu++) {
-                outputSample.append(List.of(o1Performance[dmu], o2Samples[i][dmu]));
+                outputSample.addColumns(
+                        DoubleColumn.create(dmu + "", List.of(o1Performance[dmu], o2Samples[i][dmu]))
+                );
             }
-            performanceSamples.getInputPerformances().add(inputSample);
-            performanceSamples.getOutputPerformances().add(outputSample);
+            performanceSamples.getInputPerformances().add(inputSample.transpose());
+            performanceSamples.getOutputPerformances().add(outputSample.transpose());
         }
 
         var expectedEfficiencyMatrix = new double[][]{
@@ -138,9 +144,10 @@ public class ImpreciseSmaaSamplingTests extends ImpreciseCCRTestBase {
         var smaaUtils = new ImpreciseSmaaUtils(efficiency);
 
         var efficiencyMatrix = smaaUtils.calculateEfficiencyMatrixForSamples(weightSamples, performanceSamples, 5);
-        IntStream.range(0, efficiencyMatrix.length())
+        IntStream.range(0, efficiencyMatrix.rowCount())
                 .forEach(rowIdx -> Assertions.assertArrayEquals(expectedEfficiencyMatrix[rowIdx],
-                        efficiencyMatrix.row(rowIdx).stream().mapToDouble(x -> x).toArray(), 1e-6));
+                        TestUtils.tranformTableToArray(efficiencyMatrix)[rowIdx],
+                        1e-6));
     }
 
 }

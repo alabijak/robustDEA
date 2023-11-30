@@ -3,7 +3,7 @@ package put.dea.robustness;
 import com.google.ortools.linearsolver.MPConstraint;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.List;
 
@@ -20,29 +20,31 @@ abstract class VDEABase extends RobustnessLPBase {
     }
 
     protected MPConstraint createEffDistanceConstraint(MPSolver model,
-                                                       DataFrame<Double> inputs,
-                                                       DataFrame<Double> outputs,
+                                                       Table inputs,
+                                                       Table outputs,
                                                        int subjectDmuIdx,
                                                        int relativeDmuIdx,
                                                        List<MPVariable> inputWeights,
                                                        List<MPVariable> outputWeights) {
         var constraint = model.makeConstraint();
-        for (int i = 0; i < inputs.size(); i++)
-            constraint.setCoefficient(inputWeights.get(i), inputs.get(relativeDmuIdx, i) - inputs.get(subjectDmuIdx, i));
-        for (int i = 0; i < outputs.size(); i++)
-            constraint.setCoefficient(outputWeights.get(i), outputs.get(relativeDmuIdx, i) - outputs.get(subjectDmuIdx, i));
+        for (int i = 0; i < inputs.columnCount(); i++)
+            constraint.setCoefficient(inputWeights.get(i), inputs.row(relativeDmuIdx).getDouble(i)
+                    - inputs.row(subjectDmuIdx).getDouble(i));
+        for (int i = 0; i < outputs.columnCount(); i++)
+            constraint.setCoefficient(outputWeights.get(i), outputs.row(relativeDmuIdx).getDouble(i)
+                    - outputs.row(subjectDmuIdx).getDouble(i));
         return constraint;
     }
 
-    protected List<MPVariable> makeWeightVariables(MPSolver model, DataFrame<Double> data) {
+    protected List<MPVariable> makeWeightVariables(MPSolver model, Table data) {
         return makeWeightVariables(model, data, 1);
     }
 
-    protected DataFrame<Double> transformInputsToUtilities(VDEAProblemData data) {
+    protected Table transformInputsToUtilities(VDEAProblemData data) {
         return performanceConverter.transformInputsToUtilities(data);
     }
 
-    protected DataFrame<Double> transformOutputsToUtilities(VDEAProblemData data) {
+    protected Table transformOutputsToUtilities(VDEAProblemData data) {
         return performanceConverter.transformOutputsToUtilities(data);
     }
 }

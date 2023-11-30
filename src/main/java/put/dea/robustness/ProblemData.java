@@ -1,16 +1,21 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.StringColumn;
+import tech.tablesaw.api.Table;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 /**
  * Class representing data set for problems with precise information for CCR efficiency model
  */
 public class ProblemData {
-    private final DataFrame<Double> inputData;
-    private final DataFrame<Double> outputData;
+    private final Table inputData;
+    private final Table outputData;
 
     private final Map<String, Integer> columnIndices = new HashMap<>();
     private List<Constraint> weightConstraints = new ArrayList<>();
@@ -59,8 +64,8 @@ public class ProblemData {
         if (outputNames == null)
             outputNames = generateColumnNames(outputData[0].length, "out_");
 
-        this.inputData = convertArrayToDataFrame(inputData, inputNames);
-        this.outputData = convertArrayToDataFrame(outputData, outputNames);
+        this.inputData = convertArrayToTable(inputData, inputNames);
+        this.outputData = convertArrayToTable(outputData, outputNames);
         initializeColumnIndices(inputNames, outputNames);
         this.weightConstraints = weightConstraints;
     }
@@ -69,13 +74,14 @@ public class ProblemData {
         return IntStream.range(0, count).boxed().map(idx -> prefix + idx).toList();
     }
 
-    protected DataFrame<Double> convertArrayToDataFrame(double[][] arr, List<String> columnNames) {
+    protected Table convertArrayToTable(double[][] arr, List<String> columnNames) {
 
-        var table = new DataFrame<Double>(columnNames);
-        for (double[] doubles : arr) {
-            table.append(Arrays.stream(doubles).boxed().toList());
+        var table = Table.create();
+        table.addColumns(StringColumn.create("names", columnNames));
+        for (double[] values : arr) {
+            table.addColumns(DoubleColumn.create("c" + table.columnCount(), values));
         }
-        return table;
+        return table.transpose(false, true);
     }
 
     private void initializeColumnIndices(List<String> inputNames, List<String> outputNames) {
@@ -87,37 +93,15 @@ public class ProblemData {
 
     /**
      * Constructor creating {@link ProblemData} object from input and output performances
-     * provided as {@link DataFrame} objects
+     * provided as {@link Table} objects
      *
      * @param inputData  DMUs' inputs performances
      * @param outputData DMUs' outputs performances
      */
-    public ProblemData(DataFrame<Double> inputData, DataFrame<Double> outputData) {
+    public ProblemData(Table inputData, Table outputData) {
         this.inputData = inputData;
         this.outputData = outputData;
-        initializeColumnIndices(getInputNames(), getOutputNames());
-    }
-
-    /**
-     * returns list of input factor names
-     *
-     * @return {@link List} of input factor names
-     */
-    public List<String> getInputNames() {
-        return getColumnNames(inputData);
-    }
-
-    /**
-     * returns list of output factor names
-     *
-     * @return {@link List} of output factor names
-     */
-    public List<String> getOutputNames() {
-        return getColumnNames(outputData);
-    }
-
-    protected List<String> getColumnNames(DataFrame<Double> dataFrame) {
-        return dataFrame.columns().stream().map(Object::toString).toList();
+        initializeColumnIndices(inputData.columnNames(), outputData.columnNames());
     }
 
     /**
@@ -135,7 +119,7 @@ public class ProblemData {
      * @return number of inputs in the data set
      */
     public int getInputCount() {
-        return inputData.size();
+        return inputData.columnCount();
     }
 
     /**
@@ -144,7 +128,7 @@ public class ProblemData {
      * @return number of outputs in the data set
      */
     public int getOutputCount() {
-        return outputData.size();
+        return outputData.columnCount();
     }
 
     /**
@@ -153,7 +137,7 @@ public class ProblemData {
      * @return number of DMUs in the data set
      */
     public int getDmuCount() {
-        return inputData.length();
+        return inputData.rowCount();
     }
 
     /**
@@ -161,7 +145,7 @@ public class ProblemData {
      *
      * @return DMUs' input performances
      */
-    public DataFrame<Double> getInputData() {
+    public Table getInputData() {
         return inputData;
     }
 
@@ -170,7 +154,7 @@ public class ProblemData {
      *
      * @return DMUs' output performances
      */
-    public DataFrame<Double> getOutputData() {
+    public Table getOutputData() {
         return outputData;
     }
 

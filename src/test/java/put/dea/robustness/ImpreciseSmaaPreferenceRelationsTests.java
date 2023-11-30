@@ -46,7 +46,7 @@ public class ImpreciseSmaaPreferenceRelationsTests extends ImpreciseCCRTestBase 
 
         IntStream.range(0, expectedDistribution.length)
                 .forEach(rowIdx -> Assertions.assertArrayEquals(expectedDistribution[rowIdx],
-                        distribution.row(rowIdx).stream().mapToDouble(x -> x).toArray(), 1e-6));
+                        TestUtils.tranformTableToArray(distribution)[rowIdx], 1e-6));
 
     }
 

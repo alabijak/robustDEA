@@ -1,7 +1,9 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
 import org.apache.commons.math3.util.Pair;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -16,39 +18,41 @@ class SmaaRankBase {
         this.numberOfSamples = numberOfSamples;
     }
 
-    public DataFrame<Double> calculateRankDistribution(DataFrame<Integer> ranks) {
-        var distribution = new DataFrame<Double>(
-                IntStream.range(1, ranks.length() + 1)
-                        .boxed()
-                        .map(Object::toString)
-                        .toList());
-        ranks.forEach(row -> distribution.append(calculateDistributionForRow(row, ranks.length())));
-        return distribution;
+    public Table calculateRankDistribution(Table ranks) {
+        var distribution = Table.create();
+        ranks.forEach(row -> distribution.addColumns(
+                        DoubleColumn.create(distribution.columnCount() + "",
+                                calculateDistributionForRow(row, ranks.rowCount()))
+                )
+        );
+        return distribution.transpose();
     }
 
-    private List<Double> calculateDistributionForRow(List<Integer> row, int dmuCount) {
+    private List<Double> calculateDistributionForRow(Row row, int dmuCount) {
         var distribution = new double[dmuCount];
-        row.forEach(rank -> distribution[rank] += 1);
+        IntStream.range(0, row.columnCount())
+                .mapToDouble(row::getDouble)
+                .forEach(rank -> distribution[(int) rank] += 1);
         return Arrays.stream(distribution).map(x -> x / numberOfSamples).boxed().toList();
     }
 
-    public DataFrame<Integer> calculateRanksMatrix(DataFrame<Double> efficiencies) {
-        var result = new DataFrame<Integer>();
+    public Table calculateRanksMatrix(Table efficiencies) {
+        var result = Table.create();
         for (int sampleIdx = 0; sampleIdx < numberOfSamples; sampleIdx++) {
-            var sample = efficiencies.col(sampleIdx);
+            var sample = efficiencies.doubleColumn(sampleIdx).asDoubleArray();
             var sortedSample = indicesSortedByValue(sample, true);
 
-            var rankList = indicesSortedByValue(sortedSample.stream().map(x -> (double) x).toList(),
+            var rankList = indicesSortedByValue(sortedSample.stream().mapToDouble(x -> (double) x).toArray(),
                     false);
-            result.add(sampleIdx, rankList);
+            result.addColumns(DoubleColumn.create(sampleIdx + "", rankList.stream().mapToDouble(x -> x)));
         }
         return result;
     }
 
-    private List<Integer> indicesSortedByValue(List<Double> values, boolean descending) {
+    private List<Integer> indicesSortedByValue(double[] values, boolean descending) {
         var sign = descending ? -1 : 1;
-        return IntStream.range(0, values.size())
-                .mapToObj(idx -> new Pair<>(values.get(idx), idx))
+        return IntStream.range(0, values.length)
+                .mapToObj(idx -> new Pair<>(values[idx], idx))
                 .sorted(Comparator.comparing(pair -> sign * pair.getFirst()))
                 .map(Pair::getSecond)
                 .toList();

@@ -1,8 +1,8 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
-
-import java.util.List;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Row;
+import tech.tablesaw.api.Table;
 
 class ImprecisePerformanceConverter {
     public ProblemData convertPerformanceToPrecise(ImpreciseInformation impreciseInformation,
@@ -15,71 +15,66 @@ class ImprecisePerformanceConverter {
                     dataWithTolerance.getOutputData(),
                     dataWithTolerance.getInputData().row(subjectDmuIdx),
                     dataWithTolerance.getImpreciseInformation().getMaxOutputs().row(subjectDmuIdx),
-                    subjectDmuIdx,
-                    impreciseInformation.getData().getInputNames(),
-                    dataWithTolerance.getOutputNames());
+                    subjectDmuIdx);
         else
             return convertToPrecise(
                     dataWithTolerance.getInputData(),
                     dataWithTolerance.getImpreciseInformation().getMaxOutputs(),
                     dataWithTolerance.getImpreciseInformation().getMaxInputs().row(subjectDmuIdx),
                     dataWithTolerance.getOutputData().row(subjectDmuIdx),
-                    subjectDmuIdx,
-                    impreciseInformation.getData().getInputNames(),
-                    impreciseInformation.getData().getOutputNames());
+                    subjectDmuIdx);
     }
 
     private CCRImpreciseProblemData applyTolerance(ImpreciseInformation impreciseInformation) {
         var tolerance = impreciseInformation.getTolerance();
-        var minInputs = impreciseInformation.getData()
-                .getInputData()
-                .apply(value -> applyToleranceToValue(value, tolerance, true));
-        var minOutputs = impreciseInformation.getData()
-                .getOutputData()
-                .apply(value -> applyToleranceToValue(value, tolerance, true));
+        var minInputs = applyToleranceToTable(impreciseInformation.getData().getInputData(), tolerance, true);
+        var minOutputs = applyToleranceToTable(impreciseInformation.getData().getOutputData(), tolerance, true);
 
-        DataFrame<Double> maxInputs;
+        Table maxInputs;
         if (impreciseInformation.getMaxInputs() != null)
-            maxInputs = impreciseInformation
-                    .getMaxInputs()
-                    .apply(value -> applyToleranceToValue(value, tolerance, false));
+            maxInputs = applyToleranceToTable(impreciseInformation.getMaxInputs(), tolerance, false);
         else
-            maxInputs = impreciseInformation.getData()
-                    .getInputData()
-                    .apply(value -> applyToleranceToValue(value, tolerance, false));
+            maxInputs = applyToleranceToTable(impreciseInformation.getData().getInputData(), tolerance, false);
 
-
-        DataFrame<Double> maxOutputs;
+        Table maxOutputs;
         if (impreciseInformation.getMaxInputs() != null)
-            maxOutputs = impreciseInformation
-                    .getMaxOutputs()
-                    .apply(value -> applyToleranceToValue(value, tolerance, false));
+            maxOutputs = applyToleranceToTable(impreciseInformation.getMaxOutputs(), tolerance, false);
         else
-            maxOutputs = impreciseInformation.getData()
-                    .getOutputData()
-                    .apply(value -> applyToleranceToValue(value, tolerance, false));
+            maxOutputs = applyToleranceToTable(impreciseInformation.getData().getOutputData(), tolerance, false);
 
         return new CCRImpreciseProblemData(
-                minInputs.toModelMatrix(0),
-                minOutputs.toModelMatrix(0),
-                maxInputs.toModelMatrix(0),
-                maxOutputs.toModelMatrix(0),
-                impreciseInformation.getData().getInputNames(),
-                impreciseInformation.getData().getOutputNames());
+                minInputs,
+                minOutputs,
+                maxInputs,
+                maxOutputs);
     }
 
-    private ProblemData convertToPrecise(DataFrame<Double> inputs,
-                                         DataFrame<Double> outputs,
-                                         List<Double> subjectInputs,
-                                         List<Double> subjectOutputs,
-                                         int subjectDmuIdx,
-                                         List<String> inputNames,
-                                         List<String> outputNames) {
-        var preciseInputs = inputs.toModelMatrix(0);
-        var preciseOutputs = outputs.toModelMatrix(0);
-        preciseInputs[subjectDmuIdx] = subjectInputs.stream().mapToDouble(x -> x).toArray();
-        preciseOutputs[subjectDmuIdx] = subjectOutputs.stream().mapToDouble(x -> x).toArray();
-        return new ProblemData(preciseInputs, preciseOutputs, inputNames, outputNames);
+    private ProblemData convertToPrecise(Table inputs,
+                                         Table outputs,
+                                         Row subjectInputs,
+                                         Row subjectOutputs,
+                                         int subjectDmuIdx) {
+        var preciseInputs = inputs.copy();
+        var preciseOutputs = outputs.copy();
+        var subjectInputsRow = preciseInputs.row(subjectDmuIdx);
+        for (int i = 0; i < subjectInputsRow.columnCount(); i++) {
+            subjectInputsRow.setDouble(i, subjectInputs.getDouble(i));
+        }
+        var subjectOutputRow = preciseOutputs.row(subjectDmuIdx);
+        for (int i = 0; i < subjectOutputRow.columnCount(); i++) {
+            subjectOutputRow.setDouble(i, subjectOutputs.getDouble(i));
+        }
+        return new ProblemData(preciseInputs, preciseOutputs);
+    }
+
+    private Table applyToleranceToTable(Table table, double tolerance, boolean minimum) {
+        var newTable = Table.create();
+        table.columns()
+                .stream()
+                .map(c -> (DoubleColumn) c)
+                .map(column -> column.map(value -> applyToleranceToValue(value, tolerance, minimum)))
+                .forEach(newTable::addColumns);
+        return newTable;
     }
 
     private double applyToleranceToValue(double value, double tolerance, boolean minimum) {

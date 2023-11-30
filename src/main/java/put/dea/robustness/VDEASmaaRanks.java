@@ -38,7 +38,7 @@ public class VDEASmaaRanks extends VDEASmaaBase implements SmaaRanks<VDEAProblem
         var efficiencyMatrix = calculateEfficiencyMatrix(data, inputs, outputs);
         var ranks = rankBase.calculateRanksMatrix(efficiencyMatrix);
         var distribution = rankBase.calculateRankDistribution(ranks);
-        var expectedEfficiency = calculateExpectedValues(ranks.apply(x -> x + 1).cast(Double.class));
+        var expectedEfficiency = calculateExpectedValues(ranks).stream().map(x -> x + 1).toList();
         return new DistributionResult(distribution, expectedEfficiency);
     }
 }

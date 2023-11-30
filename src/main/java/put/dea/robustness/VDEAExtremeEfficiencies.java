@@ -30,9 +30,9 @@ public class VDEAExtremeEfficiencies
         var objective = model.objective();
         objective.setOptimizationDirection(sense.isMaximize());
         for (int i = 0; i < data.getInputCount(); i++)
-            objective.setCoefficient(inputWeights.get(i), inputs.get(subjectDmuIdx, i));
+            objective.setCoefficient(inputWeights.get(i), inputs.row(subjectDmuIdx).getDouble(i));
         for (int i = 0; i < data.getOutputCount(); i++)
-            objective.setCoefficient(outputWeights.get(i), outputs.get(subjectDmuIdx, i));
+            objective.setCoefficient(outputWeights.get(i), outputs.row(subjectDmuIdx).getDouble(i));
 
         addSumWeightsToOneConstraint(model, inputWeights, outputWeights);
         addCustomWeightConstraints(data, model);

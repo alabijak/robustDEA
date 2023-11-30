@@ -3,6 +3,7 @@ package put.dea.robustness;
 import com.google.ortools.linearsolver.MPConstraint;
 import com.google.ortools.linearsolver.MPSolver;
 import com.google.ortools.linearsolver.MPVariable;
+import tech.tablesaw.api.Row;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,15 +35,15 @@ public class CCRExtremeEfficiencies
 
         var objective = model.objective();
         for (int i = 0; i < data.getOutputCount(); i++)
-            objective.setCoefficient(outputWeights.get(i), data.getOutputData().get(subjectDmuIdx, i));
+            objective.setCoefficient(outputWeights.get(i), data.getOutputData().row(subjectDmuIdx).getDouble(i));
 
         for (int k = 0; k < data.getDmuCount(); k++) {
             var constraint = model.makeConstraint(-MPSolver.infinity(), C);
             constraint.setCoefficient(binVariables[k], C);
             for (int i = 0; i < inputWeights.size(); i++)
-                constraint.setCoefficient(inputWeights.get(i), data.getInputData().get(k, i));
+                constraint.setCoefficient(inputWeights.get(i), data.getInputData().row(k).getDouble(i));
             for (int i = 0; i < outputWeights.size(); i++)
-                constraint.setCoefficient(outputWeights.get(i), -data.getOutputData().get(k, i));
+                constraint.setCoefficient(outputWeights.get(i), -data.getOutputData().row(k).getDouble(i));
         }
 
         var constraint = model.makeConstraint(1, MPSolver.infinity());
@@ -63,7 +64,7 @@ public class CCRExtremeEfficiencies
         var outputVariables = makeWeightVariables(model, data.getOutputData());
 
         for (int i = 0; i < outputVariables.size(); i++)
-            model.objective().setCoefficient(outputVariables.get(i), data.getOutputData().get(subjectDmuIdx, i));
+            model.objective().setCoefficient(outputVariables.get(i), data.getOutputData().row(subjectDmuIdx).getDouble(i));
 
         var constraint = model.makeConstraint(1, 1);
         setConstraintCoefficients(constraint, inputVariables, data.getInputData().row(subjectDmuIdx), false);
@@ -80,12 +81,13 @@ public class CCRExtremeEfficiencies
         return model;
     }
 
-    private void setConstraintCoefficients(MPConstraint constraint, List<MPVariable> variables,
-                                           List<Double> coefficients,
+    private void setConstraintCoefficients(MPConstraint constraint,
+                                           List<MPVariable> variables,
+                                           Row coefficients,
                                            boolean negative) {
         int sign = negative ? -1 : 1;
         IntStream.range(0, variables.size()).forEach(idx ->
-                constraint.setCoefficient(variables.get(idx), sign * coefficients.get(idx))
+                constraint.setCoefficient(variables.get(idx), sign * coefficients.getDouble(idx))
         );
     }
 

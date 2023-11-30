@@ -1,27 +1,32 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.Arrays;
 
 class WeightSamplesCollection {
-    private final DataFrame<Double> inputSamples;
-    private final DataFrame<Double> outputSamples;
+    private final Table inputSamples;
+    private final Table outputSamples;
 
     public WeightSamplesCollection(double[][] samples, int inputCount) {
-        inputSamples = new DataFrame<>();
-        outputSamples = new DataFrame<>();
+        var tmpInputSamples = Table.create();
+        var tmpOutputSamples = Table.create();
         for (var sample : samples) {
-            inputSamples.append(Arrays.stream(sample).boxed().limit(inputCount).toList());
-            outputSamples.append(Arrays.stream(sample).boxed().skip(inputCount).toList());
+            var inSample = Arrays.stream(sample).boxed().limit(inputCount).toList();
+            var outSample = Arrays.stream(sample).boxed().skip(inputCount).toList();
+            tmpInputSamples.addColumns(DoubleColumn.create(tmpInputSamples.columnCount() + "", inSample));
+            tmpOutputSamples.addColumns(DoubleColumn.create(tmpOutputSamples.columnCount() + "", outSample));
         }
+        inputSamples = tmpInputSamples.transpose();
+        outputSamples = tmpOutputSamples.transpose();
     }
 
-    public DataFrame<Double> getInputSamples() {
+    public Table getInputSamples() {
         return inputSamples;
     }
 
-    public DataFrame<Double> getOutputSamples() {
+    public Table getOutputSamples() {
         return outputSamples;
     }
 }

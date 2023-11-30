@@ -64,14 +64,11 @@ public class HierarchicalVDEAProblemData extends VDEAProblemData {
 
         var node = hierarchy.findNodeByName(hierarchyLevel);
         var factors = node.findAllChildFactors();
-        var inputs = getInputNames().stream().filter(factors::contains).toList();
-        var outputs = getOutputNames().stream().filter(factors::contains).toList();
-        var inputsTable = getInputData().retain(inputs.toArray());
-        var outputsTable = getOutputData().retain(outputs.toArray());
-        var dataForModel = new VDEAProblemData(inputsTable.toModelMatrix(0),
-                outputsTable.toModelMatrix(0),
-                inputs,
-                outputs);
+        var inputs = getInputData().columnNames().stream().filter(factors::contains).toList().toArray(new String[0]);
+        var outputs = getOutputData().columnNames().stream().filter(factors::contains).toList().toArray(new String[0]);
+        var inputsTable = getInputData().retainColumns(inputs);
+        var outputsTable = getOutputData().retainColumns(outputs);
+        var dataForModel = new VDEAProblemData(inputsTable, outputsTable);
         var constraints = parseWeightConstraints(node);
         dataForModel.setWeightConstraints(constraints);
         dataForModel.setFunctionShapes(getFunctionShapes());

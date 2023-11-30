@@ -2,7 +2,6 @@ package put.dea.robustness;
 
 import org.apache.commons.math3.util.Pair;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +43,8 @@ public class ImpreciseVDEAProblemData extends VDEAProblemData {
                                     double[][] maxInputData, double[][] maxOutputData) {
         super(minInputData, minOutputData);
         impreciseInformation = new ImpreciseInformation(this,
-                convertArrayToDataFrame(maxInputData, getInputNames()),
-                convertArrayToDataFrame(maxOutputData, getOutputNames()));
+                convertArrayToTable(maxInputData, getInputData().columnNames()),
+                convertArrayToTable(maxOutputData, getOutputData().columnNames()));
     }
 
     /**
@@ -64,8 +63,8 @@ public class ImpreciseVDEAProblemData extends VDEAProblemData {
                                     List<String> inputNames, List<String> outputNames) {
         super(minInputData, minOutputData, inputNames, outputNames);
         impreciseInformation = new ImpreciseInformation(this,
-                convertArrayToDataFrame(maxInputData, getInputNames()),
-                convertArrayToDataFrame(maxOutputData, getOutputNames()));
+                convertArrayToTable(maxInputData, getInputData().columnNames()),
+                convertArrayToTable(maxOutputData, getOutputData().columnNames()));
     }
 
     /**
@@ -134,20 +133,16 @@ public class ImpreciseVDEAProblemData extends VDEAProblemData {
     public Double getUpperBound(String column) {
         if (this.getUpperBounds().containsKey(column))
             return this.getUpperBounds().get(column);
-        if (this.getInputNames().contains(column))
+        if (this.getInputData().containsColumn(column))
             return this.getImpreciseInformation()
                     .getMaxInputs()
-                    .col(column)
-                    .stream()
-                    .max(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
-        if (this.getOutputNames().contains(column))
+                    .doubleColumn(column)
+                    .max();
+        if (this.getOutputData().containsColumn(column))
             return this.getImpreciseInformation()
                     .getMaxOutputs()
-                    .col(column)
-                    .stream()
-                    .max(Comparator.comparing(x -> x))
-                    .orElseThrow(IllegalArgumentException::new);
+                    .doubleColumn(column)
+                    .max();
         throw new IllegalArgumentException("Column with given name does not exist");
     }
 

@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.Random;
 
@@ -38,7 +38,7 @@ public class HierarchicalVDEASmaaPreferenceRelations extends VDEASmaaBase
      * @return matrix of PEOIs
      */
     @Override
-    public DataFrame<Double> peoi(HierarchicalVDEAProblemData data) {
+    public Table peoi(HierarchicalVDEAProblemData data) {
         return peoi(data, data.getHierarchy().getName());
     }
 
@@ -49,7 +49,7 @@ public class HierarchicalVDEASmaaPreferenceRelations extends VDEASmaaBase
      * @param data data set specification
      * @return matrix of PEOIs
      */
-    public DataFrame<Double> peoi(HierarchicalVDEAProblemData data, String hierarchyLevel) {
+    public Table peoi(HierarchicalVDEAProblemData data, String hierarchyLevel) {
         var dataForModel = data.prepareDataForModel(hierarchyLevel);
         var smaaPreferenceRelations = new VDEASmaaPreferenceRelations(numberOfSamples, random);
         return smaaPreferenceRelations.peoi(dataForModel);

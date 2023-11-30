@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
+import static put.dea.robustness.TestUtils.tranformTableToArray;
+
 public class CCRSmaaBaseTests extends CCRTestBase {
     private static CCRSmaaEfficiency efficiency;
 
@@ -42,7 +44,7 @@ public class CCRSmaaBaseTests extends CCRTestBase {
                 data.getInputData(),
                 data.getOutputData(),
                 samples);
-        assert2DDoubleArrayEquals(efficiencies, actualEfficiencies.toModelMatrix(0));
+        assert2DDoubleArrayEquals(efficiencies, tranformTableToArray(actualEfficiencies));
     }
 
     private void assert2DDoubleArrayEquals(double[][] expected, double[][] actual) {
@@ -66,8 +68,7 @@ public class CCRSmaaBaseTests extends CCRTestBase {
                 new double[]{0.178116, 0.054276, 0.654676, 0.40315, 0.329965},
                 new double[]{0.013735, 0.000417, 0.024912, 0.013558, 0.01116}
         };
-        var actualEfficiencies = efficiency.calculateEfficiencyMatrix(data)
-                .toModelMatrix(0);
+        var actualEfficiencies = tranformTableToArray(efficiency.calculateEfficiencyMatrix(data));
         assert2DDoubleArrayEquals(expected, actualEfficiencies);
     }
 

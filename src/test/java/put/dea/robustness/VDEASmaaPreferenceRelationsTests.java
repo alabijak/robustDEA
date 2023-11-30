@@ -31,7 +31,7 @@ public class VDEASmaaPreferenceRelationsTests extends VDEATestBase {
         };
         var preferenceRelations = new VDEASmaaPreferenceRelations(SmaaTestUtils.NUMBER_OF_SAMPLES,
                 SmaaTestUtils.getRandom());
-        var result = preferenceRelations.peoi(data).toModelMatrix(0);
+        var result = TestUtils.tranformTableToArray(preferenceRelations.peoi(data));
         Assertions.assertArrayEquals(peoi, result);
     }
 }

@@ -37,6 +37,7 @@ public class ImpreciseVDEASmaaDistanceTests extends ImpreciseVDEATestBase {
                 1e-6);
         IntStream.range(0, data.getDmuCount())
                 .forEach(idx -> Assertions.assertArrayEquals(expectedDistribution[idx],
-                        distribution.distribution().row(idx).stream().mapToDouble(x -> x).toArray(), 1e-6));
+                        TestUtils.tranformTableToArray(distribution.distribution())[idx],
+                        1e-6));
     }
 }

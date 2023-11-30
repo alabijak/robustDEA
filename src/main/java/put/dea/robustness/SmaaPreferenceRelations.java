@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 /**
  * Finds the pairwise efficiency outranking indices for all pairs of DMUs
@@ -14,5 +14,5 @@ public interface SmaaPreferenceRelations<T extends ProblemData> {
      * @param data data set specification
      * @return matrix of PEOIs
      */
-    DataFrame<Double> peoi(T data);
+    Table peoi(T data);
 }

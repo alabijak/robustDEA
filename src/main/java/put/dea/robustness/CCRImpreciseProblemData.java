@@ -1,5 +1,7 @@
 package put.dea.robustness;
 
+import tech.tablesaw.api.Table;
+
 import java.util.List;
 
 /**
@@ -68,9 +70,16 @@ public class CCRImpreciseProblemData extends ProblemData {
                                    List<String> outputNames) {
         super(minInputData, minOutputData, inputNames, outputNames);
 
-        var maxInputs = convertArrayToDataFrame(maxInputData, getInputNames());
-        var maxOutputs = convertArrayToDataFrame(maxOutputData, getOutputNames());
+        var maxInputs = convertArrayToTable(maxInputData, getInputData().columnNames());
+        var maxOutputs = convertArrayToTable(maxOutputData, getOutputData().columnNames());
         impreciseInformation = new ImpreciseInformation(this, maxInputs, maxOutputs);
+    }
+
+    CCRImpreciseProblemData(Table minInputData, Table minOutputData,
+                            Table maxInputData, Table maxOutputData) {
+        super(minInputData, minOutputData);
+
+        impreciseInformation = new ImpreciseInformation(this, maxInputData, maxOutputData);
     }
 
     /**

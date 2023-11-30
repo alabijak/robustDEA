@@ -44,7 +44,7 @@ public class ImpreciseCCRSmaaRanks extends CCRSmaaBase implements SmaaRanks<CCRI
                 data.getDmuCount());
         var ranks = rankBase.calculateRanksMatrix(efficiencies);
         var distribution = rankBase.calculateRankDistribution(ranks);
-        var expectedRanks = calculateExpectedValues(ranks.apply(x -> x + 1).cast(Double.class));
+        var expectedRanks = calculateExpectedValues(ranks).stream().map(x -> x + 1).toList();
         return new DistributionResult(distribution, expectedRanks);
     }
 }

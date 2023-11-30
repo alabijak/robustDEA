@@ -50,7 +50,7 @@ public class ImpreciseSmaaEfficiencyTests extends ImpreciseCCRTestBase {
 
         IntStream.range(0, expectedDistribution.length)
                 .forEach(rowIdx -> Assertions.assertArrayEquals(expectedDistribution[rowIdx],
-                        distribution.distribution().row(rowIdx).stream().mapToDouble(x -> x).toArray(), 1e-6));
+                        TestUtils.tranformTableToArray(distribution.distribution())[rowIdx], 1e-6));
         Assertions.assertArrayEquals(expectedAverage,
                 distribution.expectedValues().stream().mapToDouble(x -> x).toArray(), 1e-6);
 

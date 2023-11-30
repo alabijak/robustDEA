@@ -34,7 +34,7 @@ public class CCRSmaaRanks extends CCRSmaaBase implements SmaaRanks<ProblemData> 
         var efficiencies = calculateEfficiencyMatrix(data);
         var ranks = rankBase.calculateRanksMatrix(efficiencies);
         var distribution = rankBase.calculateRankDistribution(ranks);
-        var expectedRanks = calculateExpectedValues(ranks.apply(x -> x + 1).cast(Double.class));
+        var expectedRanks = calculateExpectedValues(ranks).stream().map(x -> x + 1).toList();
         return new DistributionResult(distribution, expectedRanks);
     }
 

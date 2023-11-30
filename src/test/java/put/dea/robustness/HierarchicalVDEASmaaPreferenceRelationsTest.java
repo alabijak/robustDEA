@@ -33,7 +33,7 @@ public class HierarchicalVDEASmaaPreferenceRelationsTest extends HierarchicalVDE
                 SmaaTestUtils.NUMBER_OF_SAMPLES,
                 SmaaTestUtils.getRandom());
         var actual = smaa.peoi(data, hierarchyLevel);
-        Assertions.assertArrayEquals(expected, actual.toModelMatrix(0));
+        Assertions.assertArrayEquals(expected, TestUtils.tranformTableToArray(actual));
 
     }
 

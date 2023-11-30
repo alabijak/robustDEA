@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.Random;
 
@@ -34,7 +34,7 @@ public class ImpreciseVDEASmaaPreferenceRelations extends VDEASmaaBase implement
     }
 
     @Override
-    public DataFrame<Double> peoi(ImpreciseVDEAProblemData data) {
+    public Table peoi(ImpreciseVDEAProblemData data) {
         var weightSamples = generateWeightSamples(data);
         var performanceSamples = impreciseSmaaUtils.generatePerformanceSamples(
                 data.getImpreciseInformation(), true);

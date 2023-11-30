@@ -1,6 +1,6 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.Table;
 
 import java.util.List;
 
@@ -10,6 +10,6 @@ import java.util.List;
  * @param distribution   values distribution
  * @param expectedValues expected values
  */
-public record DistributionResult(DataFrame<Double> distribution,
+public record DistributionResult(Table distribution,
                                  List<Double> expectedValues) {
 }

@@ -1,6 +1,7 @@
 package put.dea.robustness;
 
-import joinery.DataFrame;
+import tech.tablesaw.api.DoubleColumn;
+import tech.tablesaw.api.Table;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,12 +43,12 @@ class ImpreciseSmaaUtils {
         var data = impreciseInformation.getData();
         int variablesPerSample = (data.getDmuCount() * (data.getInputCount() + data.getOutputCount()));
         int samplesCount = samples.size() / variablesPerSample;
-        var allFactors = new ArrayList<>(data.getInputNames());
-        allFactors.addAll(data.getOutputNames());
+        var allFactors = new ArrayList<>(data.getInputData().columnNames());
+        allFactors.addAll(data.getOutputData().columnNames());
         for (int i = 0; i < samplesCount; i++) {
             var sample = getValuesForCurrentSamples(samples, variablesPerSample, i);
-            var inputTable = new DataFrame<Double>();
-            var outputTable = new DataFrame<Double>();
+            var inputTable = Table.create();
+            var outputTable = Table.create();
             for (var factor : allFactors) {
                 var factorIdx = data.getColumnIndices().get(factor);
                 boolean input = factorIdx < data.getInputCount();
@@ -62,7 +63,7 @@ class ImpreciseSmaaUtils {
                     performances = handleImpreciseFactorSample(impreciseInformation, factor,
                             factorSample, input);
                 }
-                table.add(factor, performances);
+                table.addColumns(DoubleColumn.create(factor, performances));
             }
             result.getInputPerformances().add(inputTable);
             result.getOutputPerformances().add(outputTable);
@@ -91,7 +92,7 @@ class ImpreciseSmaaUtils {
         var sortedIndices = impreciseUtils.sortIndicesByValues(data, factor, descending);
         var sortedSample = factorSample.stream().sorted().toList();
 
-        var factorPerformances = impreciseUtils.getInputOrOutputTable(data, factor).col(factor);
+        var factorPerformances = impreciseUtils.getInputOrOutputTable(data, factor).doubleColumn(factor);
         var precisePerformances = new ArrayList<>(Collections.nCopies(data.getDmuCount(), 0.0));
         precisePerformances.set(sortedIndices.get(0), sortedSample.get(0));
         for (int i = 1; i < data.getDmuCount(); i++) {
@@ -110,7 +111,7 @@ class ImpreciseSmaaUtils {
                                                      String factor,
                                                      List<Double> factorSample,
                                                      boolean input) {
-        DataFrame<Double> minTable, maxTable;
+        Table minTable, maxTable;
         if (input) {
             minTable = impreciseInformation.getData().getInputData();
             maxTable = impreciseInformation.getMaxInputs();
@@ -118,13 +119,13 @@ class ImpreciseSmaaUtils {
             minTable = impreciseInformation.getData().getOutputData();
             maxTable = impreciseInformation.getMaxOutputs();
         }
-        var minPerformances = minTable.col(factor);
-        var maxPerformances = maxTable.col(factor);
+        var minPerformances = minTable.doubleColumn(factor);
+        var maxPerformances = maxTable.doubleColumn(factor);
         return calculatePreciseValueFromRange(minPerformances, maxPerformances, factorSample);
     }
 
-    private List<Double> calculatePreciseValueFromRange(List<Double> lowerValues,
-                                                        List<Double> upperValues,
+    private List<Double> calculatePreciseValueFromRange(DoubleColumn lowerValues,
+                                                        DoubleColumn upperValues,
                                                         List<Double> ratioSample) {
         var result = new ArrayList<Double>();
         for (int i = 0; i < ratioSample.size(); i++) {
@@ -140,24 +141,27 @@ class ImpreciseSmaaUtils {
         return result;
     }
 
-    public DataFrame<Double> calculateEfficiencyMatrixForSamples(WeightSamplesCollection weightSamples,
-                                                                 PerformanceSamplesCollection performanceSamples,
-                                                                 int dmuCount) {
-        var efficiencies = new DataFrame<Double>(IntStream.range(0, smaa.getNumberOfSamples())
-                .mapToObj(x -> "sample" + x).toList());
+    public Table calculateEfficiencyMatrixForSamples(WeightSamplesCollection weightSamples,
+                                                     PerformanceSamplesCollection performanceSamples,
+                                                     int dmuCount) {
+        var efficiencies = Table.create();
         for (int dmu = 0; dmu < dmuCount; dmu++) {
             var dmuIdx = dmu;
-            efficiencies.append(IntStream.range(0, smaa.getNumberOfSamples())
-                    .mapToObj(idx -> smaa.calculateEfficiency(
-                            performanceSamples.getInputPerformances().get(idx),
-                            performanceSamples.getOutputPerformances().get(idx),
-                            weightSamples.getInputSamples().row(idx),
-                            weightSamples.getOutputSamples().row(idx),
-                            dmuIdx))
-                    .toList());
+            efficiencies.addColumns(
+                    DoubleColumn.create(dmu + "",
+                            IntStream.range(0, smaa.getNumberOfSamples())
+                                    .mapToDouble(idx -> smaa.calculateEfficiency(
+                                            performanceSamples.getInputPerformances().get(idx),
+                                            performanceSamples.getOutputPerformances().get(idx),
+                                            weightSamples.getInputSamples().row(idx),
+                                            weightSamples.getOutputSamples().row(idx),
+                                            dmuIdx))
+                                    .toArray()
+                    )
+            );
         }
 
-        return efficiencies;
+        return efficiencies.transpose();
     }
 
     public PerformanceSamplesCollection generateValueFunctionSamples(PerformanceSamplesCollection performanceSamples,
@@ -176,30 +180,31 @@ class ImpreciseSmaaUtils {
 
         var result = new PerformanceSamplesCollection();
         int samplesCount = samples.size() / variablesPerSample;
-        var allFactors = new ArrayList<>(data.getInputNames());
-        allFactors.addAll(data.getOutputNames());
+        var allFactors = new ArrayList<>(data.getInputData().columnNames());
+        allFactors.addAll(data.getOutputData().columnNames());
         for (int i = 0; i < samplesCount; i++) {
             var sample = getValuesForCurrentSamples(samples, variablesPerSample, i);
 
-            var inputTable = new DataFrame<Double>();
-            var outputTable = new DataFrame<Double>();
+            var inputTable = Table.create();
+            var outputTable = Table.create();
             var factorIdx = 0;
 
             for (var factor : allFactors) {
-                boolean input = data.getInputNames().contains(factor);
+                boolean input = data.getInputData().containsColumn(factor);
                 var table = input ? inputTable : outputTable;
                 var performanceSampleTable = input ? performanceSamples.getInputPerformances().get(i)
                         : performanceSamples.getOutputPerformances().get(i);
 
                 if (data.getImpreciseInformation().getOrdinalFactors().contains(factor)) {
-                    table.add(factor, performanceSampleTable.col(factor));
+                    table.addColumns(DoubleColumn.create(factor,
+                            performanceSampleTable.doubleColumn(factor).asDoubleArray()));
                 } else {
                     var factorSample = getFactorSample(sample, factorIdx, data.getDmuCount());
                     var performances = handleValueFunctionSamples(data,
                             performanceSampleTable,
                             factor,
                             factorSample);
-                    table.add(factor, performances);
+                    table.addColumns(DoubleColumn.create(factor, performances));
                     factorIdx++;
                 }
             }
@@ -210,7 +215,7 @@ class ImpreciseSmaaUtils {
     }
 
     private List<Double> handleValueFunctionSamples(ImpreciseVDEAProblemData data,
-                                                    DataFrame<Double> performanceSample,
+                                                    Table performanceSample,
                                                     String factor,
                                                     List<Double> functionValuesSample) {
         PerformanceToValueConverter converter = new PerformanceToValueConverter();
