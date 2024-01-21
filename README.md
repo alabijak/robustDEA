@@ -76,7 +76,7 @@ the following code must be added:
 For VDEA model we can also define the marginal function shapes (default functions are linear).
 For example, for input _in1_, we define a marginal function shape presented below:
 
-![marginal function shape for in1](doc/in1.png)
+<img src="doc/in1.png" alt="marginal function shape for in1" width="200"/>
 
     data.setFunctionShape("in1", List.of(
                 new Pair<>(0, 1.0),
