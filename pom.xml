@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.alabijak</groupId>
-    <artifactId>dea-robustness</artifactId>
+    <artifactId>robustDEA</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -16,9 +16,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <name>dea-robustness</name>
+    <name>robustDEA</name>
     <description>Library for robustness analysis for Data Envelopment Analysis.</description>
-    <url>https://github.com/alabijak/dea-robustness</url>
+    <url>https://github.com/alabijak/robustDEA</url>
 
     <licenses>
         <license>
@@ -35,9 +35,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/alabijak/dea-robustness.git</connection>
-        <developerConnection>scm:git:ssh://github.com/alabijak/dea-robustness.git</developerConnection>
-        <url>https://github.com/alabijak/dea-robustness</url>
+        <connection>scm:git:git://github.com/alabijak/robustDEA.git</connection>
+        <developerConnection>scm:git:ssh://github.com/alabijak/robustDEA.git</developerConnection>
+        <url>https://github.com/alabijak/robustDEA</url>
     </scm>
 
     <distributionManagement>

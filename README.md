@@ -1,6 +1,6 @@
-# DEA-robustness
+# RobustDEA
 
-DEA-robustness is a library implementing methods for robustness analysis in context of Data Envelopment Analysis.
+RobustDEA is a library implementing methods for robustness analysis in context of Data Envelopment Analysis.
 It provides an API to obtain the robust outcomes for four points of view, i.e. the efficiency
 scores, distance to the best DMU, efficiency ranks and pairwise preferences.
 
@@ -15,7 +15,7 @@ To add a dependency in your project's pom.xml use the following:
 
     <dependency>
         <groupId>io.github.alabijak</groupId>
-        <artifactId>dea-robustness</artifactId>
+        <artifactId>robustDEA</artifactId>
         <version>1.0.0</version>
     </dependency>
 
@@ -35,7 +35,7 @@ Let us consider an example of 5 DMUs (A-E) evaluated with 2 inputs and 1 output:
 | E   | 3   | 8   | 12   |
 
 To evaluate the DMUs' performances, we need to create a
-_[ProblemData](https://alabijak.github.io/dea-robustness/put/dea/robustness/ProblemData.html)_
+_[ProblemData](https://alabijak.github.io/robustDEA/put/dea/robustness/ProblemData.html)_
 object with considered problem setting. For CCR model, we use the following code:
 
     var inputs = new double[][]{
@@ -54,11 +54,11 @@ object with considered problem setting. For CCR model, we use the following code
         List.of("in1", "in2"), List.of("out1"));
 
 To perform the analysis using the VDEA model
-the _[ProblemData](https://alabijak.github.io/dea-robustness/put/dea/robustness/ProblemData.html)_ class must be
+the _[ProblemData](https://alabijak.github.io/robustDEA/put/dea/robustness/ProblemData.html)_ class must be
 replaced
 with
 its inherited class
-_[VDEAProblemData](https://alabijak.github.io/dea-robustness/put/dea/robustness/VDEAProblemData.html)_.
+_[VDEAProblemData](https://alabijak.github.io/robustDEA/put/dea/robustness/VDEAProblemData.html)_.
 
 The problem definition may be enhanced with custom weight constraints. For example to
 introduce the constraint in a form:
@@ -98,16 +98,16 @@ as follows:
 
 In a similar way, we can find the robust outcomes for other points of view, i.e.
 efficiency distances to the best unit (for VDEA,
-_[ExtremeDistances](https://alabijak.github.io/dea-robustness/put/dea/robustness/ExtremeDistances.html)_,
-_[SmaaDistance](https://alabijak.github.io/dea-robustness/put/dea/robustness/SmaaDistance.html)_), efficiency
-ranks (_[ExtremeRanks](https://alabijak.github.io/dea-robustness/put/dea/robustness/ExtremeRanks.html)_,
-_[SmaaRanks](https://alabijak.github.io/dea-robustness/put/dea/robustness/SmaaRanks.html)_)
+_[ExtremeDistances](https://alabijak.github.io/robustDEA/put/dea/robustness/ExtremeDistances.html)_,
+_[SmaaDistance](https://alabijak.github.io/robustDEA/put/dea/robustness/SmaaDistance.html)_), efficiency
+ranks (_[ExtremeRanks](https://alabijak.github.io/robustDEA/put/dea/robustness/ExtremeRanks.html)_,
+_[SmaaRanks](https://alabijak.github.io/robustDEA/put/dea/robustness/SmaaRanks.html)_)
 and DMUs pairwise comparisons
-(_[PreferenceRelations](https://alabijak.github.io/dea-robustness/put/dea/robustness/PreferenceRelations.html)_,
-_[SmaaPreferenceRelations](https://alabijak.github.io/dea-robustness/put/dea/robustness/SmaaPreferenceRelations.html)_).
+(_[PreferenceRelations](https://alabijak.github.io/robustDEA/put/dea/robustness/PreferenceRelations.html)_,
+_[SmaaPreferenceRelations](https://alabijak.github.io/robustDEA/put/dea/robustness/SmaaPreferenceRelations.html)_).
 
 ## References
 
-[1] API documentation. [click to visit](https://alabijak.github.io/dea-robustness)
+[1] API documentation. [click to visit](https://alabijak.github.io/robustDEA)
 
-[2] Code examples. [click to visit](https://github.com/alabijak/dea-robustness-examples)
+[2] Code examples. [click to visit](https://github.com/alabijak/robustDEA-examples)
